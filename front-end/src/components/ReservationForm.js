@@ -16,6 +16,11 @@ export default function ReservationForm() {
     setFormData(newChange);
   };
 
+  //submit handler
+  //take form data and give to server
+  //POST request. endpoint - reservations/new
+  //axios.post().then()  OR something like fetch(url, {post})
+
   return (
     <div>
       <form>
@@ -92,6 +97,10 @@ export default function ReservationForm() {
         </div>
         <button type="submit" className="btn btn-primary">
           Submit
+        </button>
+        {/* //TODO: allow someone to click cancel without anything in the form  */}
+        <button onClick={() => history.goBack()} className="btn btn-danger">
+          Cancel
         </button>
       </form>
     </div>
