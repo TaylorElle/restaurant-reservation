@@ -71,13 +71,13 @@ function isTime(req, res, next) {
   next({ status: 400, message: `Invalid reservation_time` });
 }
 
-function checkStatus(req, res, next) {
-  const { data = {} } = req.body;
-  if (data["status"] === "seated" || data["status"] === "finished") {
-    return next({ status: 400, message: `status is ${data["status"]}` });
-  }
-  next();
-}
+// function checkStatus(req, res, next) {
+//   const { data = {} } = req.body;
+//   if (data["status"] === "seated" || data["status"] === "finished") {
+//     return next({ status: 400, message: `status is ${data["status"]}` });
+//   }
+//   next();
+// }
 
 function isValidNumber(req, res, next) {
   const { data = {} } = req.body;
@@ -88,10 +88,8 @@ function isValidNumber(req, res, next) {
 }
 
 async function list(req, res) {
-  const mobile_number = req.query.mobile_number;
-  const data = await (mobile_number
-    ? service.search(mobile_number)
-    : service.list(req.query.date));
+  const data = await service.list(req.query.date);
+
   res.json({
     data,
   });
@@ -121,7 +119,7 @@ module.exports = {
     isValidDate,
     isTime,
     isValidNumber,
-    checkStatus,
+    // checkStatus,
     asyncErrorBoundary(create),
   ],
   list: [asyncErrorBoundary(list)],
