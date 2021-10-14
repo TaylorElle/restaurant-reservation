@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { postReservation } from "../utils/api";
+import ReservationErrors from "./ReservationError";
 
 function ReservationForm() {
   const history = useHistory();
@@ -14,111 +15,71 @@ function ReservationForm() {
     people: 0,
   };
 
-  const [reservationData, setReservationData] = useState(initialState);
-  // const [error, setError] = useState(null);
-  const [reservationsError, setReservationsError] = useState(null);
+  const [reservation, setReservation] = useState(initialState);
+  const [error, setError] = useState(null);
 
-  // function changeHandler({ target: { name, value } }) {
-  //   setReservation((prevState) => ({
-  //     ...prevState,
-  //     [name]: value,
-  //   }));
-  // }
   function changeHandler({ target: { name, value } }) {
-    // newChange[event.target.id] = event.target.value;
-    setReservationData((prevState) => ({
+    setReservation((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   }
 
   function changeHandlerNum({ target: { name, value } }) {
-    setReservationData((prevState) => ({
+    setReservation((prevState) => ({
       ...prevState,
       [name]: Number(value),
     }));
   }
 
-  // function validate(reservationData) {
-  //   const errors = [];
+  function validate(reservation) {
+    const errors = [];
 
-  //   function isFutureDate({ reservation_date, reservation_time }) {
-  //     const dt = new Date(`${reservation_date}T${reservation_time}`);
-  //     if (dt < new Date()) {
-  //       errors.push(new Error("Reservation must be set in the future"));
-  //     }
-  //   }
+    function isFutureDate({ reservation_date, reservation_time }) {
+      const dt = new Date(`${reservation_date}T${reservation_time}`);
+      if (dt < new Date()) {
+        errors.push(new Error("Reservation must be set in the future"));
+      }
+    }
 
-  //   function isTuesday({ reservation_date }) {
-  //     const day = new Date(reservation_date).getUTCDay();
-  //     if (day === 2) {
-  //       errors.push(new Error("No reservations available on Tuesday."));
-  //     }
-  //   }
+    function isTuesday({ reservation_date }) {
+      const day = new Date(reservation_date).getUTCDay();
+      if (day === 2) {
+        errors.push(new Error("No reservations available on Tuesday."));
+      }
+    }
 
-  //   function isOpenHours({ reservation_time }) {
-  //     const hour = parseInt(reservation_time.split(":")[0]);
-  //     const mins = parseInt(reservation_time.split(":")[1]);
+    isFutureDate(reservation);
+    isTuesday(reservation);
 
-  //     if (hour <= 10 && mins <= 30) {
-  //       errors.push(new Error("Restaurant is only open after 10:30 am"));
-  //     }
-
-  //     if (hour >= 22) {
-  //       errors.push(new Error("Restaurant is closed after 10:00 pm"));
-  //     }
-  //   }
-
-  //   isFutureDate(reservationData);
-  //   isTuesday(reservationData);
-  //   isOpenHours(reservationData);
-
-  //   return errors;
-  // }
+    return errors;
+  }
 
   //submit handler
-  //take form data and give to server
-  //POST request. endpoint - reservations/new
-  //axios.post().then()  OR something like fetch(url, {post})
   function submitHandler(event) {
     event.preventDefault();
-    // const reservationError = validate(reservationData);
-    // do not send POST request if there is a pending error message
-    // if (reservationsError.length) {
-    //   return setReservationsError(reservationError);
-    // }
+    const reservationError = validate(reservation);
+    // do not send POST request if there is an error message
+    if (reservationError.length) {
+      return setError(reservationError);
+    }
 
     const abortController = new window.AbortController();
     // POST request (new reservation)
 
-    postReservation(reservationData)
+    postReservation(reservation)
       .then((createdReservation) => {
         const res_date =
           createdReservation.reservation_date.match(/\d{4}-\d{2}-\d{2}/)[0];
         history.push(`/dashboard?date=` + res_date);
       })
-      .catch(setReservationsError);
-
-    // async function postData() {
-    //   try {
-    //     await postReservation(reservationData, abortController.signal()).then(
-    //       (createdReservation) => {
-    //         history.push(
-    //           `/dashboard?date=${createdReservation.reservation_date}`
-    //         );
-    //       }
-    //     );
-    //   } catch (error) {
-    //     setReservationsError([...reservationsError, error.message]);
-    //   }
-    // }
-
-    // postData();
+      .catch(setError);
   }
 
   return (
     <div>
       <form onSubmit={submitHandler}>
+        <ReservationErrors errors={error} />
         <div className="form-group row">
           <label htmlFor="first_name">
             First Name
@@ -127,7 +88,7 @@ function ReservationForm() {
               type="text"
               name="first_name"
               onChange={changeHandler}
-              value={reservationData.first_name}
+              value={reservation.first_name}
               placeholder="John"
               required="required"
             />
@@ -138,7 +99,7 @@ function ReservationForm() {
             type="text"
             name="last_name"
             onChange={changeHandler}
-            value={reservationData.last_name}
+            value={reservation.last_name}
             placeholder="Smith"
             required="required"
           ></input>
@@ -148,7 +109,7 @@ function ReservationForm() {
             type="tel"
             name="mobile_number"
             onChange={changeHandler}
-            value={reservationData.mobile_number}
+            value={reservation.mobile_number}
             placeholder="xxx-xxx-xxxx or xxx-xxxx"
             pattern="([0-9]{3}-)?[0-9]{3}-[0-9]{4}"
             required="required"
@@ -158,7 +119,7 @@ function ReservationForm() {
             id="reservation_date"
             name="reservation_date"
             onChange={changeHandler}
-            value={reservationData.reservation_date}
+            value={reservation.reservation_date}
             type="date"
             placeholder="YYYY-MM-DD"
             pattern="\d{4}-\d{2}-\d{2}"
@@ -169,7 +130,7 @@ function ReservationForm() {
             id="reservation_time"
             name="reservation_time"
             onChange={changeHandler}
-            value={reservationData.reservation_time}
+            value={reservation.reservation_time}
             type="time"
             placeholder="HH:MM"
             pattern="[0-9]{2}:[0-9]{2}"
@@ -180,7 +141,7 @@ function ReservationForm() {
             id="people"
             name="people"
             onChange={changeHandlerNum}
-            value={reservationData.people}
+            value={reservation.people}
             type="number"
             min="1"
             required="required"
