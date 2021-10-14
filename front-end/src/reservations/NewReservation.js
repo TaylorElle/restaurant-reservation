@@ -1,13 +1,12 @@
 import React from "react";
 import ReservationForm from "./ReservationForm";
 // defines the New Reservation page
-export default function NewReservation() {
+function NewReservation() {
   return (
-    <section>
-      <div>
-        <h1>New Reservation</h1>
-      </div>
+    <main>
+      <h1>New Reservation</h1>
       <ReservationForm />
-    </section>
+    </main>
   );
 }
+export default NewReservation;

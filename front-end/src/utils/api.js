@@ -77,5 +77,5 @@ export async function postReservation(reservation, signal) {
     body: JSON.stringify({ data: reservation }),
     signal,
   };
-  return await fetchJson(url, options, {});
+  return await fetchJson(url, options, reservation);
 }

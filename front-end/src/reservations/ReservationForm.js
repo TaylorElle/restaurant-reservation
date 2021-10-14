@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { postReservation } from "../utils/api";
 
-export default function ReservationForm() {
+function ReservationForm() {
+  const history = useHistory();
+
   const initialState = {
     first_name: "",
     last_name: "",
@@ -11,10 +13,10 @@ export default function ReservationForm() {
     reservation_time: "",
     people: 0,
   };
+
   const [reservationData, setReservationData] = useState(initialState);
   // const [error, setError] = useState(null);
   const [reservationsError, setReservationsError] = useState(null);
-  const history = useHistory();
 
   // function changeHandler({ target: { name, value } }) {
   //   setReservation((prevState) => ({
@@ -22,14 +24,20 @@ export default function ReservationForm() {
   //     [name]: value,
   //   }));
   // }
-  const formChange = ({ target: { name, value } }) => {
-    const newChange = { ...reservationData };
+  function changeHandler({ target: { name, value } }) {
     // newChange[event.target.id] = event.target.value;
-    setReservationData((newChange) => ({
-      ...newChange,
+    setReservationData((prevState) => ({
+      ...prevState,
       [name]: value,
     }));
-  };
+  }
+
+  function changeHandlerNum({ target: { name, value } }) {
+    setReservationData((prevState) => ({
+      ...prevState,
+      [name]: Number(value),
+    }));
+  }
 
   // function validate(reservationData) {
   //   const errors = [];
@@ -72,7 +80,7 @@ export default function ReservationForm() {
   //take form data and give to server
   //POST request. endpoint - reservations/new
   //axios.post().then()  OR something like fetch(url, {post})
-  const handleSubmit = (event) => {
+  function submitHandler(event) {
     event.preventDefault();
     // const reservationError = validate(reservationData);
     // do not send POST request if there is a pending error message
@@ -82,26 +90,35 @@ export default function ReservationForm() {
 
     const abortController = new window.AbortController();
     // POST request (new reservation)
-    async function postData() {
-      try {
-        await postReservation(reservationData, abortController.signal()).then(
-          (createdReservation) => {
-            history.push(
-              `/dashboard?date=${createdReservation.reservation_date}`
-            );
-          }
-        );
-      } catch (error) {
-        setReservationsError([...reservationsError, error.message]);
-      }
-    }
 
-    postData();
-  };
+    postReservation(reservationData)
+      .then((createdReservation) => {
+        const res_date =
+          createdReservation.reservation_date.match(/\d{4}-\d{2}-\d{2}/)[0];
+        history.push(`/dashboard?date=` + res_date);
+      })
+      .catch(setReservationsError);
+
+    // async function postData() {
+    //   try {
+    //     await postReservation(reservationData, abortController.signal()).then(
+    //       (createdReservation) => {
+    //         history.push(
+    //           `/dashboard?date=${createdReservation.reservation_date}`
+    //         );
+    //       }
+    //     );
+    //   } catch (error) {
+    //     setReservationsError([...reservationsError, error.message]);
+    //   }
+    // }
+
+    // postData();
+  }
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={submitHandler}>
         <div className="form-group row">
           <label htmlFor="first_name">
             First Name
@@ -109,7 +126,7 @@ export default function ReservationForm() {
               id="first_name"
               type="text"
               name="first_name"
-              onChange={formChange}
+              onChange={changeHandler}
               value={reservationData.first_name}
               placeholder="John"
               required="required"
@@ -120,7 +137,7 @@ export default function ReservationForm() {
             id="last_name"
             type="text"
             name="last_name"
-            onChange={formChange}
+            onChange={changeHandler}
             value={reservationData.last_name}
             placeholder="Smith"
             required="required"
@@ -128,9 +145,9 @@ export default function ReservationForm() {
           <label htmlFor="mobile_number">Phone Number</label>
           <input
             id="mobile_number"
-            type="text"
+            type="tel"
             name="mobile_number"
-            onChange={formChange}
+            onChange={changeHandler}
             value={reservationData.mobile_number}
             placeholder="xxx-xxx-xxxx or xxx-xxxx"
             pattern="([0-9]{3}-)?[0-9]{3}-[0-9]{4}"
@@ -140,7 +157,7 @@ export default function ReservationForm() {
           <input
             id="reservation_date"
             name="reservation_date"
-            onChange={formChange}
+            onChange={changeHandler}
             value={reservationData.reservation_date}
             type="date"
             placeholder="YYYY-MM-DD"
@@ -151,7 +168,7 @@ export default function ReservationForm() {
           <input
             id="reservation_time"
             name="reservation_time"
-            onChange={formChange}
+            onChange={changeHandler}
             value={reservationData.reservation_time}
             type="time"
             placeholder="HH:MM"
@@ -162,7 +179,7 @@ export default function ReservationForm() {
           <input
             id="people"
             name="people"
-            onChange={formChange}
+            onChange={changeHandlerNum}
             value={reservationData.people}
             type="number"
             min="1"
@@ -184,3 +201,5 @@ export default function ReservationForm() {
     </div>
   );
 }
+
+export default ReservationForm;
