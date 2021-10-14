@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import Reservations from "./Reservations";
+import { useHistory } from "react-router-dom";
+import useQuery from "../utils/useQuery";
 
 /**
  * Defines the dashboard page.
@@ -14,6 +16,17 @@ function Dashboard({ date }) {
   const [reservationsError, setReservationsError] = useState(null);
 
   useEffect(loadDashboard, [date]);
+
+  // useEffect(() => {
+  //   if (!theDate) history.push(`/dashboard?date=${date}`);
+  // }, [query, history, theDate, date]);
+  // useEffect(loadDashboard, [date, history, theDate]);
+  // useEffect(() => {
+  //   const abortController = new window.AbortController();
+  //   listReservations({ date }, abortController.signal)
+  //     .then(setReservations)
+  //     .catch(setReservationsError);
+  // }, [reservations]);
 
   function loadDashboard() {
     const abortController = new window.AbortController();

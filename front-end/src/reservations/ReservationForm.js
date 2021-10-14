@@ -80,29 +80,36 @@ function ReservationForm() {
     <div>
       <form onSubmit={submitHandler}>
         <ReservationErrors errors={error} />
+
         <div className="form-group row">
           <label htmlFor="first_name">
             First Name
             <input
               id="first_name"
-              type="text"
               name="first_name"
               onChange={changeHandler}
               value={reservation.first_name}
               placeholder="John"
               required="required"
+              className="form-control"
             />
           </label>
+        </div>
+
+        <div className="form-group row">
           <label htmlFor="last_name">Last Name</label>
           <input
             id="last_name"
-            type="text"
             name="last_name"
             onChange={changeHandler}
             value={reservation.last_name}
             placeholder="Smith"
             required="required"
+            className="form-control"
           ></input>
+        </div>
+
+        <div className="form-group row">
           <label htmlFor="mobile_number">Phone Number</label>
           <input
             id="mobile_number"
@@ -113,7 +120,11 @@ function ReservationForm() {
             placeholder="xxx-xxx-xxxx or xxx-xxxx"
             pattern="([0-9]{3}-)?[0-9]{3}-[0-9]{4}"
             required="required"
+            className="form-control"
           ></input>
+        </div>
+
+        <div className="form-group row">
           <label htmlFor="reservation_date">Reservation Date</label>
           <input
             id="reservation_date"
@@ -124,7 +135,11 @@ function ReservationForm() {
             placeholder="YYYY-MM-DD"
             pattern="\d{4}-\d{2}-\d{2}"
             required="required"
+            className="form-control"
           ></input>
+        </div>
+
+        <div className="form-group row">
           <label htmlFor="reservation_time">Reservation Time</label>
           <input
             id="reservation_time"
@@ -135,7 +150,11 @@ function ReservationForm() {
             placeholder="HH:MM"
             pattern="[0-9]{2}:[0-9]{2}"
             required="required"
+            className="form-control"
           />
+        </div>
+
+        <div className="form-group row">
           <label htmlFor="people">Party Size</label>
           <input
             id="people"
@@ -143,10 +162,12 @@ function ReservationForm() {
             onChange={changeHandlerNum}
             value={reservation.people}
             type="number"
-            min="1"
+            min={1}
             required="required"
+            className="form-control"
           ></input>
         </div>
+
         <button type="submit" className="btn btn-primary">
           Submit
         </button>
