@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { postReservation } from "../utils/api";
 import ReservationErrors from "./ReservationError";
+import { today, formatAsTime } from "../utils/date-time.js";
 
 function ReservationForm() {
   const history = useHistory();
@@ -15,28 +16,38 @@ function ReservationForm() {
     people: 0,
   };
 
-  const [reservation, setReservation] = useState(initialState);
+  const [reservation, setReservation] = useState({ ...initialState });
   const [error, setError] = useState(null);
 
   function changeHandler({ target: { name, value } }) {
+    if (name === "people" && typeof value === "string") {
+      value = +value;
+    }
     setReservation((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   }
 
-  function changeHandlerNum({ target: { name, value } }) {
-    setReservation((prevState) => ({
-      ...prevState,
-      [name]: Number(value),
-    }));
-  }
+  // function changeHandlerNum({ target: { name, value } }) {
+  //   if (name === "people" && typeof value === "string") {
+  //     value = +value;
+  //   }
+  //   setReservation((prevState) => ({
+  //     ...prevState,
+  //     [name]: value,
+  //   }));
+  // }
 
   function validate(reservation) {
     const errors = [];
 
     function isFutureDate({ reservation_date, reservation_time }) {
+      //reservation date
       const dt = new Date(`${reservation_date}T${reservation_time}`);
+      //date right now = new Date()
+      console.log(dt, "---", new Date());
+      //if reservation date is less than date right now,
       if (dt < new Date()) {
         errors.push(new Error("Reservation must be set in the future"));
       }
@@ -57,23 +68,24 @@ function ReservationForm() {
 
   //submit handler
   function submitHandler(event) {
+    const abortController = new window.AbortController();
     event.preventDefault();
     const reservationError = validate(reservation);
     // do not send POST request if there is an error message
     if (reservationError.length) {
       return setError(reservationError);
     }
-
-    const abortController = new window.AbortController();
     // POST request (new reservation)
+    postReservation(reservation, abortController.signal)
+      .then(
+        () => history.push(`/dashboard?date=${reservation.reservation_date}`)
 
-    postReservation(reservation)
-      .then((createdReservation) => {
-        const res_date =
-          createdReservation.reservation_date.match(/\d{4}-\d{2}-\d{2}/)[0];
-        history.push(`/dashboard?date=` + res_date);
-      })
+        // const res_date =
+        //   createdReservation.reservation_date.match(/\d{4}-\d{2}-\d{2}/)[0];
+        // history.push(`/dashboard?date=` + res_date);
+      )
       .catch(setError);
+    return () => abortController.abort();
   }
 
   return (
@@ -86,6 +98,7 @@ function ReservationForm() {
             First Name
             <input
               id="first_name"
+              type="text"
               name="first_name"
               onChange={changeHandler}
               value={reservation.first_name}
@@ -100,6 +113,7 @@ function ReservationForm() {
           <label htmlFor="last_name">Last Name</label>
           <input
             id="last_name"
+            type="text"
             name="last_name"
             onChange={changeHandler}
             value={reservation.last_name}
@@ -113,7 +127,7 @@ function ReservationForm() {
           <label htmlFor="mobile_number">Phone Number</label>
           <input
             id="mobile_number"
-            type="tel"
+            type="text"
             name="mobile_number"
             onChange={changeHandler}
             value={reservation.mobile_number}
@@ -159,10 +173,10 @@ function ReservationForm() {
           <input
             id="people"
             name="people"
-            onChange={changeHandlerNum}
+            onChange={changeHandler}
             value={reservation.people}
             type="number"
-            min={1}
+            min="1"
             required="required"
             className="form-control"
           ></input>

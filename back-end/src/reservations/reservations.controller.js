@@ -2,6 +2,7 @@ const service = require("./reservations.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
 function hasValidFields(req, res, next) {
+  console.log("hasvalidfields");
   const { data = {} } = req.body;
   const validFields = new Set([
     "first_name",
@@ -29,6 +30,8 @@ function hasValidFields(req, res, next) {
 }
 
 function bodyDataHas(propertyName) {
+  console.log("bodydatahas");
+
   return function (req, res, next) {
     const { data = {} } = req.body;
     if (data[propertyName]) {
@@ -37,19 +40,32 @@ function bodyDataHas(propertyName) {
     next({ status: 400, message: `Must include a ${propertyName}` });
   };
 }
-
+//convert to UTC format and then compare
 function isValidDate(req, res, next) {
+  console.log("isvaliddate");
+
   const { data = {} } = req.body;
   const reservation_date = new Date(data["reservation_date"]);
   const day = reservation_date.getUTCDay();
-
+  console.log(
+    "server:",
+    "reservation_date",
+    reservation_date,
+    "new Date()",
+    new Date(),
+    "day",
+    day
+  );
   if (isNaN(Date.parse(data["reservation_date"]))) {
+    console.log("isNaN");
     return next({ status: 400, message: `Invalid reservation_date` });
   }
   if (day === 2) {
+    console.log("its a tuesday");
     return next({ status: 400, message: `Restaurant is closed on Tuesdays` });
   }
-  if (reservation_date < new Date()) {
+  if (Date.parse(reservation_date) < Date.now()) {
+    console.log("is less than");
     return next({
       status: 400,
       message: `Reservation must be set in the future`,
@@ -59,6 +75,8 @@ function isValidDate(req, res, next) {
 }
 
 function isTime(req, res, next) {
+  console.log("istime");
+
   const { data = {} } = req.body;
   if (
     /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(data["reservation_time"]) ||
@@ -80,6 +98,8 @@ function isTime(req, res, next) {
 // }
 
 function isValidNumber(req, res, next) {
+  console.log("isvalidnumber");
+
   const { data = {} } = req.body;
   if (data["people"] === 0 || !Number.isInteger(data["people"])) {
     return next({ status: 400, message: `Invalid number of people` });
@@ -91,7 +111,7 @@ async function list(req, res) {
   const data = await service.list(req.query.date);
 
   res.json({
-    data,
+    data: [...data],
   });
 }
 

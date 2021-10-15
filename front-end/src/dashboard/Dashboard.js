@@ -12,6 +12,10 @@ import useQuery from "../utils/useQuery";
  * @returns {JSX.Element}
  */
 function Dashboard({ date }) {
+  const dateInUrl = useQuery().get("date");
+  if (dateInUrl) {
+    date = dateInUrl;
+  }
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
 
@@ -27,6 +31,20 @@ function Dashboard({ date }) {
   //     .then(setReservations)
   //     .catch(setReservationsError);
   // }, [reservations]);
+
+  // function loadReservations() {
+  //   setReservations("loading");
+
+  //   const abortController = new window.AbortController();
+  //   setReservationsError(null);
+
+  //   // listReservations will run every time {date} changes
+  //   listReservations({ date }, abortController.signal)
+  //     .then(setReservations)
+  //     .catch(setReservationsError);
+
+  //   return () => abortController.abort();
+  // }
 
   function loadDashboard() {
     const abortController = new window.AbortController();
