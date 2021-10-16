@@ -47,6 +47,7 @@ function ReservationForm() {
       const reservationDateTime = new Date(
         `${reservation_date}T${reservation_time}`
       );
+      console.log("reservationDateTime line 50", reservationDateTime);
       //date right now = new Date()
       console.log(
         reservationDateTime,

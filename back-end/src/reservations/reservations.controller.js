@@ -30,8 +30,6 @@ function hasValidFields(req, res, next) {
 }
 
 function bodyDataHas(propertyName) {
-  console.log("bodydatahas");
-
   return function (req, res, next) {
     const { data = {} } = req.body;
     if (data[propertyName]) {
@@ -43,29 +41,27 @@ function bodyDataHas(propertyName) {
 //convert to UTC format and then compare
 function isValidDate(req, res, next) {
   console.log("isvaliddate");
-
   const { data = {} } = req.body;
-  const reservation_date = new Date(data["reservation_date"]);
-  const day = reservation_date.getUTCDay();
-  console.log(
-    "server:",
-    "reservation_date",
-    reservation_date,
-    "new Date()",
-    new Date(),
-    "day",
-    day
+  const reservationDateTime = new Date(
+    `${data.reservation_date}T${data.reservation_time}`
   );
+  console.log("line49 reservationDateTime", reservationDateTime);
+  // const reservation_date = new Date(data["reservation_date"]);
+  const day = reservationDateTime.getUTCDay();
+  console.log("51 day ", day);
+  console.log("52 reservation_date", data.reservation_date);
+  console.log("53 new Date()", new Date());
+  console.log("54 day", day);
   if (isNaN(Date.parse(data["reservation_date"]))) {
     console.log("isNaN");
     return next({ status: 400, message: `Invalid reservation_date` });
   }
   if (day === 2) {
-    console.log("its a tuesday");
+    console.log("day =2");
     return next({ status: 400, message: `Restaurant is closed on Tuesdays` });
   }
-  if (Date.parse(reservation_date) < Date.now()) {
-    console.log("is less than");
+  if (reservationDateTime < Date.now()) {
+    console.log("reservationDateTime < Date.now()");
     return next({
       status: 400,
       message: `Reservation must be set in the future`,
