@@ -85,6 +85,22 @@ function isTime(req, res, next) {
   next({ status: 400, message: `Invalid reservation_time` });
 }
 
+function duringOperatingHours(req, res, next) {
+  const { reservation_time } = req.body.data;
+  const open = 1030;
+  const close = 2130;
+  const reservation =
+    reservation_time.substring(0, 2) + reservation_time.substring(3);
+  if (reservation > open && reservation < close) {
+    return next();
+  } else {
+    return next({
+      status: 400,
+      message: "Reservations are only allowed between 10:30am and 9:30pm",
+    });
+  }
+}
+
 // function checkStatus(req, res, next) {
 //   const { data = {} } = req.body;
 //   if (data["status"] === "seated" || data["status"] === "finished") {
@@ -134,6 +150,7 @@ module.exports = {
     has_people,
     isValidDate,
     isTime,
+    duringOperatingHours,
     isValidNumber,
     // checkStatus,
     asyncErrorBoundary(create),
