@@ -107,7 +107,7 @@ Have a look at the following examples:
 
 - `npm run test:1` runs all the tests for user story 1 (both frontend and backend).
 - `npm run test:3:backend` runs only the backend tests for user story 3.
-- `npm run test:3:frontend` runs only the frontend tests for user story 3.
+- `npm run test:3:frontend` runs only the frontend tests for user cd .story 3.
 
 Whenever possible, frontend tests will run before backend tests to help you follow outside-in development.
 
