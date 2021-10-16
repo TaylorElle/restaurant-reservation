@@ -49,6 +49,8 @@ export function today() {
   return asDateString(new Date());
 }
 
+
+
 /**
  * Subtracts one day to the specified date and return it in as YYYY-MM-DD.
  * @param currentDate

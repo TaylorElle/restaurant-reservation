@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { listReservations } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import Reservations from "./Reservations";
-import { useHistory } from "react-router-dom";
 import useQuery from "../utils/useQuery";
 
 /**

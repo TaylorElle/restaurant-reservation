@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { postReservation } from "../utils/api";
 import ReservationErrors from "./ReservationError";
-import { today, formatAsTime } from "../utils/date-time.js";
+import { today } from "../utils/date-time.js";
 
 function ReservationForm() {
   const history = useHistory();
@@ -40,46 +40,64 @@ function ReservationForm() {
   // }
 
   function validate(reservation) {
-    console.log("validate");
     const errors = [];
 
     function isFutureDate({ reservation_date, reservation_time }) {
       //reservation date
-      const dt = new Date(`${reservation_date}T${reservation_time}`);
+      const reservationDateTime = new Date(
+        `${reservation_date}T${reservation_time}`
+      );
       //date right now = new Date()
-      console.log(dt, "---", new Date());
+      console.log(
+        reservationDateTime,
+        "---",
+        new Date(),
+        "-------->>>today",
+        today()
+      );
+      console.log("date now()", Date.now());
       //if reservation date is less than date right now,
-      if (dt < new Date()) {
+      if (reservationDateTime < new Date()) {
         errors.push(new Error("Reservation must be set in the future"));
       }
     }
 
     function isTuesday({ reservation_date }) {
-      console.log("isTuesday");
       const day = new Date(reservation_date).getUTCDay();
       if (day === 2) {
         errors.push(new Error("No reservations available on Tuesday."));
       }
     }
 
-    function isOpenHours({ reservation_time }) {
-      console.log("isOpenHours");
-      const hour = parseInt(reservation_time.split(":")[0], 10);
-      console.log(hour);
-      const mins = parseInt(reservation_time.split(":")[1], 10);
-      console.log(mins);
-      if (hour < 10 && mins < 30) {
-        console.log("it's less than!");
+    function isOpenHours(reservation) {
+      const reservationDateTime = new Date(
+        `${reservation.reservation_date}T${reservation.reservation_time}:00.000`
+      );
+
+      // //should push an error if ANY time is before 10:30am
+      if (
+        reservationDateTime.getHours() < 10 ||
+        (reservationDateTime.getHours() === 10 &&
+          reservationDateTime.getMinutes() < 30)
+      ) {
         errors.push(new Error("Restaurant is only open after 10:30 am"));
       }
-
-      if (hour >= 21 && mins > 30) {
-        console.log("it's great than!");
+      //should push an error if ANY time is AFTER 9:30pm but before 10:30
+      else if (
+        reservationDateTime.getHours() === 21 &&
+        reservationDateTime.getMinutes() > 30
+      ) {
         errors.push(
-          new Error(
-            "No new reservations after 9:30pm. Our restaurant closes at 10:30pm"
-          )
+          new Error("Reservation must be made at least 1 hour before closing")
         );
+      }
+      // should push an error if ANY time is AFTER 10:30pm
+      else if (
+        reservationDateTime.getHours() >= 22 ||
+        (reservationDateTime.getHours() === 22 &&
+          reservationDateTime.getMinutes() >= 30)
+      ) {
+        errors.push(new Error("Restaurant closes at 10:30pm"));
       }
     }
 
