@@ -40,6 +40,7 @@ function ReservationForm() {
   // }
 
   function validate(reservation) {
+    console.log("validate");
     const errors = [];
 
     function isFutureDate({ reservation_date, reservation_time }) {
@@ -54,14 +55,37 @@ function ReservationForm() {
     }
 
     function isTuesday({ reservation_date }) {
+      console.log("isTuesday");
       const day = new Date(reservation_date).getUTCDay();
       if (day === 2) {
         errors.push(new Error("No reservations available on Tuesday."));
       }
     }
 
+    function isOpenHours({ reservation_time }) {
+      console.log("isOpenHours");
+      const hour = parseInt(reservation_time.split(":")[0], 10);
+      console.log(hour);
+      const mins = parseInt(reservation_time.split(":")[1], 10);
+      console.log(mins);
+      if (hour < 10 && mins < 30) {
+        console.log("it's less than!");
+        errors.push(new Error("Restaurant is only open after 10:30 am"));
+      }
+
+      if (hour >= 21 && mins > 30) {
+        console.log("it's great than!");
+        errors.push(
+          new Error(
+            "No new reservations after 9:30pm. Our restaurant closes at 10:30pm"
+          )
+        );
+      }
+    }
+
     isFutureDate(reservation);
     isTuesday(reservation);
+    isOpenHours(reservation);
 
     return errors;
   }
