@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { listReservations } from "../utils/api";
+import { listReservations, listTables } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import Reservations from "./Reservations";
 import useQuery from "../utils/useQuery";
+import Tables from "./Tables";
 
 /**
  * Defines the dashboard page.
@@ -17,33 +18,9 @@ function Dashboard({ date }) {
   }
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
+  const [tables, setTables] = useState([]);
 
   useEffect(loadDashboard, [date]);
-
-  // useEffect(() => {
-  //   if (!theDate) history.push(`/dashboard?date=${date}`);
-  // }, [query, history, theDate, date]);
-  // useEffect(loadDashboard, [date, history, theDate]);
-  // useEffect(() => {
-  //   const abortController = new window.AbortController();
-  //   listReservations({ date }, abortController.signal)
-  //     .then(setReservations)
-  //     .catch(setReservationsError);
-  // }, [reservations]);
-
-  // function loadReservations() {
-  //   setReservations("loading");
-
-  //   const abortController = new window.AbortController();
-  //   setReservationsError(null);
-
-  //   // listReservations will run every time {date} changes
-  //   listReservations({ date }, abortController.signal)
-  //     .then(setReservations)
-  //     .catch(setReservationsError);
-
-  //   return () => abortController.abort();
-  // }
 
   function loadDashboard() {
     const abortController = new window.AbortController();
@@ -51,6 +28,8 @@ function Dashboard({ date }) {
     listReservations({ date }, abortController.signal)
       .then(setReservations)
       .catch(setReservationsError);
+    listTables().then(setTables);
+
     return () => abortController.abort();
   }
 
@@ -58,10 +37,14 @@ function Dashboard({ date }) {
     <main>
       <h1>Dashboard</h1>
       <div className="d-md-flex mb-3">
-        <h4 className="mb-0">Reservations</h4>
+        <h4 className="mb-0">Reservations for: {date}</h4>
       </div>
       <ErrorAlert error={reservationsError} />
       <Reservations reservations={reservations} />
+      <div className="d-md-flex mb-3">
+        <h4 className="mb-0">Tables</h4>
+      </div>
+      <Tables tables={tables} />
     </main>
   );
 }
