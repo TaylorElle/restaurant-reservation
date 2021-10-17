@@ -21,15 +21,12 @@ function ReservationForm() {
 
   function changeHandler({ target: { name, value } }) {
     if (name === "people" && typeof value === "string") {
-      console.log("24", name === "people" && typeof value === "string");
       value = +value;
-      console.log(" 25", value);
     }
     setReservation((prevState) => ({
       ...prevState,
       [name]: value,
     }));
-    console.log("32", reservation);
   }
 
   // function changeHandlerNum({ target: { name, value } }) {
@@ -44,31 +41,31 @@ function ReservationForm() {
 
   function validate(reservation) {
     const errors = [];
-    console.log(errors);
 
     function isFutureDate({ reservation_date, reservation_time }) {
       //reservation date
       const reservationDateTime = new Date(
         `${reservation_date}T${reservation_time}`
       );
-      console.log("54", "reservationDateTime ", reservationDateTime);
+      console.log("reservationDateTime line 50", reservationDateTime);
       //date right now = new Date()
-      console.log("56", new Date(), "-------->>>today 59", today());
-      console.log("57 date now()", Date.now());
+      console.log(
+        reservationDateTime,
+        "---",
+        new Date(),
+        "-------->>>today",
+        today()
+      );
+      console.log("date now()", Date.now());
       //if reservation date is less than date right now,
       if (reservationDateTime < new Date()) {
-        console.log("60", reservationDateTime < new Date());
         errors.push(new Error("Reservation must be set in the future"));
-        console.log(errors);
       }
     }
 
     function isTuesday({ reservation_date }) {
-      console.log("66", reservation_date);
       const day = new Date(reservation_date).getUTCDay();
-      console.log("68", day);
       if (day === 2) {
-        console.log("70", day === 2);
         errors.push(new Error("No reservations available on Tuesday."));
       }
     }
@@ -77,18 +74,13 @@ function ReservationForm() {
       const reservationDateTime = new Date(
         `${reservation.reservation_date}T${reservation.reservation_time}:00.000`
       );
-      console.log("78", reservationDateTime);
+
       // //should push an error if ANY time is before 10:30am
       if (
         reservationDateTime.getHours() < 10 ||
         (reservationDateTime.getHours() === 10 &&
           reservationDateTime.getMinutes() < 30)
       ) {
-        console.log(
-          reservationDateTime.getHours() < 10 ||
-            (reservationDateTime.getHours() === 10 &&
-              reservationDateTime.getMinutes() < 30)
-        );
         errors.push(new Error("Restaurant is only open after 10:30 am"));
       }
       //should push an error if ANY time is AFTER 9:30pm but before 10:30
@@ -96,10 +88,6 @@ function ReservationForm() {
         reservationDateTime.getHours() === 21 &&
         reservationDateTime.getMinutes() > 30
       ) {
-        console.log(
-          reservationDateTime.getHours() === 21 &&
-            reservationDateTime.getMinutes() > 30
-        );
         errors.push(
           new Error("Reservation must be made at least 1 hour before closing")
         );
@@ -110,22 +98,16 @@ function ReservationForm() {
         (reservationDateTime.getHours() === 22 &&
           reservationDateTime.getMinutes() >= 30)
       ) {
-        console.log(
-          reservationDateTime.getHours() >= 22 ||
-            (reservationDateTime.getHours() === 22 &&
-              reservationDateTime.getMinutes() >= 30)
-        );
         errors.push(new Error("Restaurant closes at 10:30pm"));
       }
     }
-    console.log("about to call is Future Date function");
+
     isFutureDate(reservation);
-    console.log("121", isFutureDate(reservation));
+    console.log(isFutureDate(reservation));
     isTuesday(reservation);
-    console.log("123", isTuesday(reservation));
+    console.log(isTuesday(reservation));
     isOpenHours(reservation);
-    console.log("125", isOpenHours(reservation));
-    console.log(errors);
+    console.log(isOpenHours(reservation));
 
     return errors;
   }

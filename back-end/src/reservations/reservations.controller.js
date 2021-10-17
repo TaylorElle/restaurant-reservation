@@ -30,6 +30,7 @@ function hasValidFields(req, res, next) {
 }
 
 function bodyDataHas(propertyName) {
+  console.log(propertyName);
   return function (req, res, next) {
     const { data = {} } = req.body;
     if (data[propertyName]) {
@@ -37,10 +38,11 @@ function bodyDataHas(propertyName) {
     }
     next({ status: 400, message: `Must include a ${propertyName}` });
   };
+  console.log("bodyDataHas(propertyName)", bodyDataHas(propertyName));
 }
 //convert to UTC format and then compare
 function isValidDate(req, res, next) {
-  console.log("isvaliddate");
+  console.log("43 isvaliddate");
   const { data = {} } = req.body;
   const reservationDateTime = new Date(
     `${data.reservation_date}T${data.reservation_time}`
@@ -53,15 +55,15 @@ function isValidDate(req, res, next) {
   console.log("53 new Date()", new Date());
   console.log("54 day", day);
   if (isNaN(Date.parse(data["reservation_date"]))) {
-    console.log("isNaN");
+    console.log("56 isNaN");
     return next({ status: 400, message: `Invalid reservation_date` });
   }
   if (day === 2) {
-    console.log("day =2");
+    console.log("60 day =2");
     return next({ status: 400, message: `Restaurant is closed on Tuesdays` });
   }
   if (reservationDateTime < Date.now()) {
-    console.log("reservationDateTime < Date.now()");
+    console.log("64 reservationDateTime < Date.now()");
     return next({
       status: 400,
       message: `Reservation must be set in the future`,
@@ -71,7 +73,7 @@ function isValidDate(req, res, next) {
 }
 
 function isTime(req, res, next) {
-  console.log("istime");
+  console.log("line 74 istime");
 
   const { data = {} } = req.body;
   if (
@@ -80,18 +82,29 @@ function isTime(req, res, next) {
       data["reservation_time"]
     )
   ) {
+    console.log(
+      "line 83--",
+      /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(data["reservation_time"]) ||
+        /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/.test(
+          data["reservation_time"]
+        )
+    );
     return next();
   }
   next({ status: 400, message: `Invalid reservation_time` });
 }
 
 function duringOperatingHours(req, res, next) {
+  console.log(" line 89 durinOperatingHours");
   const { reservation_time } = req.body.data;
+  console.log(reservation_time);
   const open = 1030;
   const close = 2130;
   const reservation =
     reservation_time.substring(0, 2) + reservation_time.substring(3);
+  console.log(reservation);
   if (reservation > open && reservation < close) {
+    console.log("line 98", reservation > open && reservation < close);
     return next();
   } else {
     return next({
@@ -110,16 +123,19 @@ function duringOperatingHours(req, res, next) {
 // }
 
 function isValidNumber(req, res, next) {
-  console.log("isvalidnumber");
+  console.log(" line 116 isvalidnumber");
 
   const { data = {} } = req.body;
+  console.log(data);
   if (data["people"] === 0 || !Number.isInteger(data["people"])) {
+    console.log(data["people"] === 0 || !Number.isInteger(data["people"]));
     return next({ status: 400, message: `Invalid number of people` });
   }
   next();
 }
 
 async function list(req, res) {
+  console.log("list ilne 128");
   const data = await service.list(req.query.date);
 
   res.json({
