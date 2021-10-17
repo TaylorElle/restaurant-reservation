@@ -2,15 +2,12 @@ exports.up = function (knex) {
   return knex.schema.createTable("tables", (table) => {
     table.increments("table_id").primary();
     table.string("table_name").notNullable();
-    table.integer("capacity", null).unsigned().notNullable();
+    table.integer("capacity".notNullable();
     table
-      .integer("reservation_id")
-      .unsigned()
-      .nullable()
-      .defaultTo(null)
-      .index()
+      .foreign("reservation_id")
       .references("reservation_id")
-      .inTable("reservations");
+      .inTable("reservations")
+      .onDelete("CASCADE");
     table.timestamps(true, true);
   });
 };
