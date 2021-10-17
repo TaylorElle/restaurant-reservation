@@ -21,16 +21,23 @@ function hasValidFields(req, res, next) {
     (field) => !validFields.has(field)
   );
 
-  if (invalidFields.length)
+  if (invalidFields.length) {
     return next({
       status: 400,
       message: `Invalid field(s): ${invalidFields.join(", ")}`,
     });
+  }
   next();
 }
+const has_first_name = bodyHasData("first_name");
+const has_last_name = bodyHasData("last_name");
+const has_mobile_number = bodyHasData("mobile_number");
+const has_reservation_date = bodyHasData("reservation_date");
+const has_reservation_time = bodyHasData("reservation_time");
+const has_people = bodyHasData("people");
 
-function bodyDataHas(propertyName) {
-  console.log(propertyName);
+function bodyHasData(propertyName) {
+  console.log("bodyHasData- property name:", propertyName);
   return function (req, res, next) {
     const { data = {} } = req.body;
     if (data[propertyName]) {
@@ -38,7 +45,7 @@ function bodyDataHas(propertyName) {
     }
     next({ status: 400, message: `Must include a ${propertyName}` });
   };
-  console.log("bodyDataHas(propertyName)", bodyDataHas(propertyName));
+  console.log("bodyHasData(propertyName)", bodyHasData(propertyName));
 }
 //convert to UTC format and then compare
 function isValidDate(req, res, next) {
@@ -147,13 +154,6 @@ async function create(req, res) {
   const data = await service.create(req.body.data);
   res.status(201).json({ data: data });
 }
-
-const has_first_name = bodyDataHas("first_name");
-const has_last_name = bodyDataHas("last_name");
-const has_mobile_number = bodyDataHas("mobile_number");
-const has_reservation_date = bodyDataHas("reservation_date");
-const has_reservation_time = bodyDataHas("reservation_time");
-const has_people = bodyDataHas("people");
 
 module.exports = {
   create: [

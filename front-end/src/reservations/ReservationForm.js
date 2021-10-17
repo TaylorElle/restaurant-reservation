@@ -27,6 +27,7 @@ function ReservationForm() {
       ...prevState,
       [name]: value,
     }));
+    console.log(reservation);
   }
 
   // function changeHandlerNum({ target: { name, value } }) {
@@ -41,6 +42,7 @@ function ReservationForm() {
 
   function validate(reservation) {
     const errors = [];
+    console.log(errors);
 
     function isFutureDate({ reservation_date, reservation_time }) {
       //reservation date
@@ -117,6 +119,7 @@ function ReservationForm() {
     const abortController = new window.AbortController();
     event.preventDefault();
     const reservationError = validate(reservation);
+    console.log(reservationError);
     // do not send POST request if there is an error message
     if (reservationError.length) {
       return setError(reservationError);
