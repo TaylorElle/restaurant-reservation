@@ -37,7 +37,7 @@ const has_reservation_time = bodyHasData("reservation_time");
 const has_people = bodyHasData("people");
 
 function bodyHasData(propertyName) {
-  console.log("bodyHasData- property name:", propertyName);
+  // console.log("bodyHasData- property name:", propertyName);
   return function (req, res, next) {
     const { data = {} } = req.body;
     if (data[propertyName]) {
@@ -141,6 +141,35 @@ function isValidNumber(req, res, next) {
   next();
 }
 
+function hasReservationId(req, res, next) {
+  const reservation = req.params.reservation_id || req.body.data.reservation_id;
+
+  if (reservation) {
+    next();
+  } else {
+    next({
+      status: 400,
+      message: `missing reservation_id`,
+    });
+  }
+}
+
+async function reservationExists(req, res, next) {
+  const reservation_id = res.locals.reservation_id;
+  const reservation = await service.read(reservation_id);
+  if (reservation) {
+    res.locals.reservation = reservation;
+    next();
+  } else {
+    next({ status: 404, message: `Reservation not found: ${reservation_id}` });
+  }
+}
+
+async function create(req, res) {
+  const data = await service.create(req.body.data);
+  res.status(201).json({ data: data });
+}
+
 async function list(req, res) {
   console.log("list ilne 128");
   const data = await service.list(req.query.date);
@@ -150,9 +179,11 @@ async function list(req, res) {
   });
 }
 
-async function create(req, res) {
-  const data = await service.create(req.body.data);
-  res.status(201).json({ data: data });
+async function read(req, res) {
+  const data = res.locals.reservation;
+  res.status(200).json({
+    data,
+  });
 }
 
 module.exports = {
@@ -172,4 +203,5 @@ module.exports = {
     asyncErrorBoundary(create),
   ],
   list: [asyncErrorBoundary(list)],
+  read: [hasReservationId, reservationExists, asyncErrorBoundary(read)],
 };
