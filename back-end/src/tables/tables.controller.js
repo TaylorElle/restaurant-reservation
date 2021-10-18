@@ -5,6 +5,7 @@ const reservationService = require("../reservations/reservations.service");
 function bodyDataHas(propertyName) {
   return function (req, res, next) {
     const { data = {} } = req.body;
+    if (!data) return next({ status: 400, message: `Must include a data` });
     if (data[propertyName]) {
       next();
     }
@@ -14,7 +15,6 @@ function bodyDataHas(propertyName) {
 
 const has_table_name = bodyDataHas("table_name");
 const has_capacity_property = bodyDataHas("capacity");
-const has_reservation_id = bodyDataHas("reservation_id");
 
 function isValidTableName(req, res, next) {
   const { table_name } = req.body.data;
@@ -67,9 +67,8 @@ async function list(req, res) {
 async function create(req, res) {
   const data = await service.create(req.body.data);
   res.status(201).json({
-    data: data,
+    data,
   });
-  console.log(res.status);
 }
 
 function hasTableId(req, res, next) {
@@ -206,7 +205,7 @@ module.exports = {
   update: [
     asyncErrorBoundary(tableExists),
     hasTableId,
-    has_reservation_id,
+    // has_reservation_id,
     asyncErrorBoundary(reservationExists),
     hasCapacity,
     isBooked,
