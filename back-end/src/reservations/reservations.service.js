@@ -14,11 +14,11 @@ function create(reservation) {
     .then((createdReservations) => createdReservations[0]);
 }
 
-function read(reservation_id) {
+function read(reservationId) {
   return knex(tableName)
     .select("*")
-    .where("reservation_id", reservation_id)
-    .first();
+    .where({ reservation_id: reservationId })
+    .then((result) => result[0]);
 }
 
 module.exports = {

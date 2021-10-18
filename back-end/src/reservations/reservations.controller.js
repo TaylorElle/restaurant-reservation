@@ -141,27 +141,27 @@ function isValidNumber(req, res, next) {
   next();
 }
 
-function hasReservationId(req, res, next) {
-  const reservation = req.params.reservation_id || req.body.data.reservation_id;
+// function hasReservationId(req, res, next) {
+//   const reservation = req.params.reservation_id || req.body.data.reservation_id;
 
-  if (reservation) {
-    next();
-  } else {
-    next({
-      status: 400,
-      message: `missing reservation_id`,
-    });
-  }
-}
+//   if (reservation) {
+//     next();
+//   } else {
+//     next({
+//       status: 400,
+//       message: `missing reservation_id`,
+//     });
+//   }
+// }
 
 async function reservationExists(req, res, next) {
-  const reservation_id = res.locals.reservation_id;
-  const reservation = await service.read(reservation_id);
+  const { reservationId } = req.params;
+  const reservation = await service.read(Number(reservationId));
   if (reservation) {
     res.locals.reservation = reservation;
-    next();
+    return next();
   } else {
-    next({ status: 404, message: `Reservation not found: ${reservation_id}` });
+    next({ status: 404, message: `Reservation not found: ${reservationId}` });
   }
 }
 
@@ -180,9 +180,9 @@ async function list(req, res) {
 }
 
 async function read(req, res) {
-  const data = res.locals.reservation;
+  const reservation = res.locals.reservation;
   res.status(200).json({
-    data,
+    data: reservation,
   });
 }
 
@@ -203,5 +203,5 @@ module.exports = {
     asyncErrorBoundary(create),
   ],
   list: [asyncErrorBoundary(list)],
-  read: [hasReservationId, reservationExists, asyncErrorBoundary(read)],
+  read: [reservationExists, asyncErrorBoundary(read)],
 };
