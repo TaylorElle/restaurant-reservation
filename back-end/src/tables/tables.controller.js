@@ -5,7 +5,8 @@ const hasProperties = require("../errors/hasProperties");
 
 //* Validation vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-async function hasData(req, res, next) {
+function hasData(req, res, next) {
+  console.log("req.body.data", req.body.data);
   if (!req.body.data) {
     return next({
       status: 400,
@@ -15,7 +16,8 @@ async function hasData(req, res, next) {
   return next();
 }
 
-async function hasReservationId(req, res, next) {
+function hasReservationId(req, res, next) {
+  console.log("20 req.body.data.reservation_id", req.body.data.reservation_id);
   if (req.body.data.reservation_id) {
     return next();
   }
@@ -27,6 +29,7 @@ async function hasReservationId(req, res, next) {
 
 async function reservationExists(req, res, next) {
   const { reservation_id } = req.body.data;
+  console.log("32 reservation_id", reservation_id);
   const reservation = await reservationsService.read(reservation_id);
   if (reservation) {
     res.locals.reservation = reservation;
@@ -39,7 +42,8 @@ async function reservationExists(req, res, next) {
 }
 
 async function reservationIsBooked(req, res, next) {
-  const { reservation } = res.locals;
+  const reservation = res.locals.reservation;
+  console.log("46 reservation", reservation);
   if (reservation.status !== "seated") {
     return next();
   }
@@ -51,7 +55,7 @@ async function reservationIsBooked(req, res, next) {
 
 async function tableExists(req, res, next) {
   const { table_id } = req.params;
-  const table = await service.read(table_id);
+  const table = await service.read(Number(table_id));
   if (table) {
     res.locals.table = table;
     return next();
@@ -63,34 +67,39 @@ async function tableExists(req, res, next) {
 }
 
 function tableIsBigEnough(req, res, next) {
-  const { table, reservation } = res.locals;
-  if (table.capacity >= reservation.people) {
-    return next();
+  const tableCapacity = res.locals.table.capacity;
+  const guests = res.locals.reservation.people;
+  if (tableCapacity < guests) {
+    next({
+      status: 400,
+      message: `Too many guests ( ${guests} ) for table size. Please choose table with capacity.`,
+    });
+  } else {
+    next();
   }
-  next({
-    status: 400,
-    message: `Table with id: ${table.table_id} does not have the capacity to seat this reservation: capacity must be at least ${reservation.people}`,
-  });
 }
 
 function tableIsFree(req, res, next) {
-  const { table } = res.locals;
-  console.log(table);
-  if (!table.reservation_id) {
-    return next();
+  if (res.locals.table.reservation_id) {
+    next({
+      status: 400,
+      message: `Table id is occupied: ${res.locals.table.table_id}`,
+    });
+  } else {
+    next();
   }
-  next({
-    status: 400,
-    message: `Table with id: ${table.table_id} is already occupied`,
-  });
 }
 
 function occupyTable(req, res, next) {
   const { table } = res.locals;
+  console.log("res.locals", res.locals);
+  console.log("94 occupy table table", table);
   const { reservation_id } = req.body.data;
+  console.log("96 occupyTable reservation_id", reservation_id);
   table.reservation_id = reservation_id;
   res.locals.resId = reservation_id;
   res.locals.resStatus = "seated";
+  console.log(" res.locals.resStatus", res.locals.resStatus);
   if (table.reservation_id) {
     return next();
   }
@@ -197,6 +206,7 @@ async function read(req, res) {
 //* resId and resStatus are coming from last middleware (occupy and deoccupy table) before update for BOTH adding and deleting reservation_ids from tables. They are needed for the knex transaction in tables.service.js
 async function update(req, res) {
   const { table, resId, resStatus } = res.locals;
+  console.log("table, resId, resStatus", table, resId, resStatus);
   const updatedTable = { ...table };
   const data = await service.update(updatedTable, resId, resStatus);
   res.status(200).json({ data });
@@ -214,13 +224,13 @@ module.exports = {
   ],
   read: [asyncErrorBoundary(tableExists), asyncErrorBoundary(read)],
   assignReservationId: [
-    asyncErrorBoundary(hasData),
-    asyncErrorBoundary(hasReservationId),
+    hasData,
+    hasReservationId,
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(reservationIsBooked),
     asyncErrorBoundary(tableExists),
-    tableIsBigEnough,
     tableIsFree,
+    tableIsBigEnough,
     occupyTable,
     asyncErrorBoundary(update),
   ],

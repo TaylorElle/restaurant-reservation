@@ -23,7 +23,7 @@ function read(reservationId) {
 }
 
 function status(reservation) {
-  console.log("26from status reservation", reservation);
+  // console.log("26from status reservation", reservation);
   update(reservation);
   return validStatus(reservation);
 }

@@ -2,7 +2,7 @@ const service = require("./reservations.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 
 function hasValidFields(req, res, next) {
-  console.log("hasvalidfields");
+  // console.log("hasvalidfields");
   const { data = {} } = req.body;
   const validFields = new Set([
     "first_name",
@@ -47,7 +47,7 @@ const has_people = bodyHasData("people");
 
 //convert to UTC format and then compare
 function isValidDate(req, res, next) {
-  console.log("43 isvaliddate");
+  // console.log("43 isvaliddate");
   const { data = {} } = req.body;
   const reservationDateTime = new Date(
     `${data.reservation_date}T${data.reservation_time}`
@@ -78,7 +78,7 @@ function isValidDate(req, res, next) {
 }
 
 function isTime(req, res, next) {
-  console.log("line 74 istime");
+  // console.log("line 74 istime");
 
   const { data = {} } = req.body;
   if (
@@ -87,29 +87,29 @@ function isTime(req, res, next) {
       data["reservation_time"]
     )
   ) {
-    console.log(
-      "line 83--",
-      /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(data["reservation_time"]) ||
-        /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/.test(
-          data["reservation_time"]
-        )
-    );
+    // console.log(
+    //   "line 83--",
+    //   /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/.test(data["reservation_time"]) ||
+    //     /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/.test(
+    //       data["reservation_time"]
+    //     )
+    // );
     return next();
   }
   next({ status: 400, message: `Invalid reservation_time` });
 }
 
 function duringOperatingHours(req, res, next) {
-  console.log(" line 89 durinOperatingHours");
+  // console.log(" line 89 durinOperatingHours");
   const { reservation_time } = req.body.data;
-  console.log(reservation_time);
+  // console.log(reservation_time);
   const open = 1030;
   const close = 2130;
   const reservation =
     reservation_time.substring(0, 2) + reservation_time.substring(3);
-  console.log(reservation);
+  // console.log(reservation);
   if (reservation > open && reservation < close) {
-    console.log("line 98", reservation > open && reservation < close);
+    // console.log("line 98", reservation > open && reservation < close);
     return next();
   } else {
     return next({
@@ -121,14 +121,14 @@ function duringOperatingHours(req, res, next) {
 
 function checkStatus(req, res, next) {
   const { data = {} } = req.body;
-  console.log("127 data[status]", data["status"]);
+  // console.log("127 data[status]", data["status"]);
   if (data["status"] === "seated" || data["status"] === "finished") {
     return next({ status: 400, message: `status is ${data["status"]}` });
   }
   next();
 }
 function unfinishedStatus(req, res, next) {
-  console.log("unfinishedStatus");
+  // console.log("unfinishedStatus");
   if ("booked" !== res.locals.reservation.status) {
     return next({
       status: 400,
@@ -141,12 +141,11 @@ function unfinishedStatus(req, res, next) {
 }
 
 function isValidNumber(req, res, next) {
-  console.log(" line 116 isvalidnumber");
-
+  // console.log(" line 116 isvalidnumber");
   const { data = {} } = req.body;
-  console.log(data);
+  // console.log(data);
   if (data["people"] === 0 || !Number.isInteger(data["people"])) {
-    console.log(data["people"] === 0 || !Number.isInteger(data["people"]));
+    // console.log(data["people"] === 0 || !Number.isInteger(data["people"]));
     return next({ status: 400, message: `Invalid number of people` });
   }
   next();
@@ -154,7 +153,7 @@ function isValidNumber(req, res, next) {
 
 function hasReservationId(req, res, next) {
   const reservation = req.params.reservation_id;
-  console.log("147 reservation", reservation);
+  // console.log("147 reservation", reservation);
   if (reservation) {
     if (isNaN(reservation)) {
       return next({
@@ -175,7 +174,7 @@ function hasReservationId(req, res, next) {
 
 async function reservationExists(req, res, next) {
   const reservationId = res.locals.reservation_id;
-  console.log("177 reservation", reservationId);
+  // console.log("177 reservation", reservationId);
   const reservation = await service.read(Number(reservationId));
   if (reservation) {
     res.locals.reservation = reservation;
@@ -197,9 +196,8 @@ async function create(req, res, next) {
 }
 
 async function list(req, res) {
-  console.log("req.query.date", req.query.date);
+  // console.log("req.query.date", req.query.date);
   const data = await service.list(req.query.date);
-
   res.json({
     data: data,
   });
@@ -213,10 +211,10 @@ async function read(req, res, next) {
 
 async function update(req, res) {
   res.locals.reservation.status = req.body.data.status;
-  console.log(
-    "204  res.locals.reservation.status",
-    res.locals.reservation.status
-  );
+  // console.log(
+  //   "204  res.locals.reservation.status",
+  //   res.locals.reservation.status
+  // );
   const data = await service.status(res.locals.reservation);
   res.json({ data });
 }
