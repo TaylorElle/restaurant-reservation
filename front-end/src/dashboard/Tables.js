@@ -11,7 +11,6 @@ function Tables({ onFinish, tables = [] }) {
         "Is this table ready to seat new guests? This cannot be undone."
       )
     ) {
-      //finishTable(tableIdFinish, reservationIdFinish);
       onFinish(tableIdFinish, reservationIdFinish);
     }
   }
