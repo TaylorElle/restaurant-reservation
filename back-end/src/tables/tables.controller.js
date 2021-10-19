@@ -5,7 +5,15 @@ const hasProperties = require("../errors/hasProperties");
 
 //* Validation vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
-// asyncfunction hasData (req, res, eext)
+async function hasData(req, res, next) {
+  if (!req.body.data) {
+    return next({
+      status: 400,
+      message: `data is missing from request`,
+    });
+  }
+  return next();
+}
 
 async function hasReservationId(req, res, next) {
   if (req.body.data.reservation_id) {
@@ -204,6 +212,7 @@ module.exports = {
   ],
   read: [asyncErrorBoundary(tableExists), asyncErrorBoundary(read)],
   assignReservationId: [
+    asyncErrorBoundary(hasData),
     asyncErrorBoundary(hasReservationId),
     asyncErrorBoundary(reservationExists),
     asyncErrorBoundary(reservationIsBooked),
