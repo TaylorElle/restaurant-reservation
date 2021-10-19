@@ -16,11 +16,9 @@ function hasValidFields(req, res, next) {
     "updated_at",
     "reservation_id",
   ]);
-
   const invalidFields = Object.keys(data).filter(
     (field) => !validFields.has(field)
   );
-
   if (invalidFields.length) {
     return next({
       status: 400,
@@ -29,12 +27,6 @@ function hasValidFields(req, res, next) {
   }
   next();
 }
-const has_first_name = bodyHasData("first_name");
-const has_last_name = bodyHasData("last_name");
-const has_mobile_number = bodyHasData("mobile_number");
-const has_reservation_date = bodyHasData("reservation_date");
-const has_reservation_time = bodyHasData("reservation_time");
-const has_people = bodyHasData("people");
 
 function bodyHasData(propertyName) {
   // console.log("bodyHasData- property name:", propertyName);
@@ -46,6 +38,13 @@ function bodyHasData(propertyName) {
     next({ status: 400, message: `Must include a ${propertyName}` });
   };
 }
+const has_first_name = bodyHasData("first_name");
+const has_last_name = bodyHasData("last_name");
+const has_mobile_number = bodyHasData("mobile_number");
+const has_reservation_date = bodyHasData("reservation_date");
+const has_reservation_time = bodyHasData("reservation_time");
+const has_people = bodyHasData("people");
+
 //convert to UTC format and then compare
 function isValidDate(req, res, next) {
   console.log("43 isvaliddate");
@@ -155,8 +154,15 @@ function hasReservationId(req, res, next) {
   const reservation = req.params.reservation_id || req.body.data.reservation_id;
   console.log("147 reservation", reservation);
   if (reservation) {
-    res.locals.reservation_id = reservation;
-    return next();
+    if (isNaN(reservation)) {
+      return next({
+        status: 400,
+        message: `reservation_id must be a number`,
+      });
+    } else {
+      res.locals.reservation_id = reservation;
+      return next();
+    }
   } else {
     return next({
       status: 400,
@@ -166,8 +172,7 @@ function hasReservationId(req, res, next) {
 }
 
 async function reservationExists(req, res, next) {
-  const { reservationId } = req.params;
-  console.log("160 reservationId", reservationId);
+  const reservationId = req.params.reservationId;
   const reservation = await service.read(Number(reservationId));
   if (reservation) {
     res.locals.reservation = reservation;
@@ -177,9 +182,15 @@ async function reservationExists(req, res, next) {
   }
 }
 
-async function create(req, res) {
-  const data = await service.create(req.body.data);
-  res.status(201).json({ data: data });
+async function create(req, res, next) {
+  const { status } = req.body.data;
+  if (status == "seated" || status == "finished")
+    return next({
+      status: 400,
+      message: "status cannot be 'seated' or 'finished'",
+    });
+  const results = await service.create(req.body.data);
+  res.status(201).json({ data: results });
 }
 
 async function list(req, res) {
@@ -187,24 +198,23 @@ async function list(req, res) {
   const data = await service.list(req.query.date);
 
   res.json({
-    data: [...data],
+    data: data,
   });
 }
 
-async function read(req, res) {
-  const reservation = res.locals.reservation;
-  res.status(200).json({
-    data: reservation,
-  });
+async function read(req, res, next) {
+  const { reservation_id } = req.params;
+  const results = await service.read(reservation_id);
+  res.status(200).json({ data: results });
 }
 
-async function status(req, res) {
+async function update(req, res) {
   res.locals.reservation.status = req.body.data.status;
   console.log(
-    "192  res.locals.reservation.status",
+    "204  res.locals.reservation.status",
     res.locals.reservation.status
   );
-  const data = await service.status(Number(res.locals.reservation));
+  const data = await service.update(Number(res.locals.reservation));
   res.json({ data });
 }
 
@@ -230,6 +240,6 @@ module.exports = {
     hasReservationId,
     reservationExists,
     unfinishedStatus,
-    asyncErrorBoundary(status),
+    asyncErrorBoundary(update),
   ],
 };

@@ -3,30 +3,31 @@ const knex = require("../db/connection");
 const tableName = "reservations";
 
 function list(date) {
-  return knex(tableName)
-    .where("reservation_date", date)
-    .whereNotIn("status", ["finished", "cancelled"])
+  return knex("reservations")
+    .select("*")
+    .where({ reservation_date: date })
+    .andWhereNot({ status: "finished" })
     .orderBy("reservation_time");
 }
 
 function create(reservation) {
-  return knex(tableName)
+  return knex("reservations")
     .insert(reservation, "*")
-    .then((createdReservations) => createdReservations[0]);
+    .then((createdRecords) => createdRecords[0]);
 }
 
 function read(reservationId) {
-  return knex(tableName)
+  return knex("reservations")
     .select("*")
     .where({ reservation_id: reservationId })
-    .then((result) => result[0]);
-}
-
-function update(reservation) {
-  return knex(tableName)
-    .where({ reservation_id: reservation.reservation_id })
-    .update(reservation, "*")
     .then((records) => records[0]);
+}
+function update(updatedReservation) {
+  return knex("reservations")
+    .select("*")
+    .where({ reservation_id: updatedReservation.reservation_id })
+    .update(updatedReservation, "*")
+    .then((updatedReservations) => updatedReservations[0]);
 }
 
 function status(reservation) {
