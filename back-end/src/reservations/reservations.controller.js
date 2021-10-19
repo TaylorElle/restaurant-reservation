@@ -130,12 +130,13 @@ function checkStatus(req, res, next) {
 function unfinishedStatus(req, res, next) {
   console.log("unfinishedStatus");
   if ("booked" !== res.locals.reservation.status) {
-    next({
+    return next({
       status: 400,
       message: `Reservation status: '${res.locals.reservation.status}'.`,
     });
   } else {
-    next();
+    reservation = res.locals.reservation;
+    return next();
   }
 }
 
@@ -216,7 +217,7 @@ async function update(req, res) {
     "204  res.locals.reservation.status",
     res.locals.reservation.status
   );
-  const data = await service.status(Number(res.locals.reservation));
+  const data = await service.status(res.locals.reservation);
   res.json({ data });
 }
 
