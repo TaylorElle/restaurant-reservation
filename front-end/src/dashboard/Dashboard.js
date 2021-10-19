@@ -9,7 +9,6 @@ import ErrorAlert from "../layout/ErrorAlert";
 import Reservations from "./Reservations";
 import useQuery from "../utils/useQuery";
 import Tables from "./Tables";
-// import DateNavigation from "./DateNavigation";
 
 /**
  * Defines the dashboard page.
@@ -27,54 +26,27 @@ function Dashboard({ date }) {
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = useState(null);
 
-  useEffect(loadReservations, [date]);
-  useEffect(loadTables, []);
+  useEffect(loadDashboard, [date]);
 
-  // function loadDashboard() {
-  //   const abortController = new window.AbortController();
-  //   setReservationsError(null);
-  //   listReservations({ date }, abortController.signal)
-  //     .then(setReservations)
-  //     .catch(setReservationsError);
-  //   listTables().then(setTables).catch(setTablesError);
+  function loadDashboard() {
+    const abortController = new window.AbortController();
+    setReservationsError(null);
+    listReservations({ date }, abortController.signal)
+      .then(setReservations)
+      .catch(setReservationsError);
+    listTables().then(setTables).catch(setTablesError);
 
-  //   return () => abortController.abort();
-  // }
+    return () => abortController.abort();
+  }
   // function onCancel(reservation_id) {
   //   cancelReservation(reservation_id)
   //     .then(loadDashboard)
   //     .catch(setReservationsError);
   // }
 
-  function loadReservations() {
-    setReservations("loading");
-
-    const abortController = new window.AbortController();
-    setReservationsError(null);
-
-    // listReservations will run every time {date} changes
-    listReservations({ date }, abortController.signal)
-      .then(setReservations)
-      .catch(setReservationsError);
-
-    return () => abortController.abort();
+  function onFinish(table_id, reservation_id) {
+    finishTable(table_id, reservation_id).then(loadDashboard);
   }
-
-  function loadTables() {
-    setTables("loading");
-    const abortController = new window.AbortController();
-    setTablesError(null);
-
-    listTables(abortController.signal).then(setTables).catch(setTablesError);
-
-    return () => abortController.abort();
-  }
-
-  // const displayDateLong = formatDisplayDate(date, "long");
-
-  // function onFinish(table_id, reservation_id) {
-  //   finishTable(table_id, reservation_id).then(loadDashboard);
-  // }
 
   return (
     <main>
@@ -82,14 +54,13 @@ function Dashboard({ date }) {
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Reservations for: {date}</h4>
       </div>
-      <Reservations reservations={reservations} />
       <ErrorAlert error={reservationsError} />
-
+      <Reservations reservations={reservations} />
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Tables</h4>
-        <Tables tables={tables} />
-        <ErrorAlert error={tablesError} />
       </div>
+      <ErrorAlert error={tablesError} />
+      <Tables tables={tables} onFinish={onFinish} />
     </main>
   );
 }
