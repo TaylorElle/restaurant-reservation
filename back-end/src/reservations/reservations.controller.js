@@ -45,7 +45,6 @@ function bodyHasData(propertyName) {
     }
     next({ status: 400, message: `Must include a ${propertyName}` });
   };
-  console.log("bodyHasData(propertyName)", bodyHasData(propertyName));
 }
 //convert to UTC format and then compare
 function isValidDate(req, res, next) {
@@ -121,13 +120,24 @@ function duringOperatingHours(req, res, next) {
   }
 }
 
-// function checkStatus(req, res, next) {
-//   const { data = {} } = req.body;
-//   if (data["status"] === "seated" || data["status"] === "finished") {
-//     return next({ status: 400, message: `status is ${data["status"]}` });
-//   }
-//   next();
-// }
+function checkStatus(req, res, next) {
+  const { data = {} } = req.body;
+  console.log("127 data[status]", data["status"]);
+  if (data["status"] === "seated" || data["status"] === "finished") {
+    return next({ status: 400, message: `status is ${data["status"]}` });
+  }
+  next();
+}
+async function unfinishedStatus(req, res, next) {
+  if ("booked" !== res.locals.reservation.status) {
+    next({
+      status: 400,
+      message: `Reservation status: '${res.locals.reservation.status}'.`,
+    });
+  } else {
+    next();
+  }
+}
 
 function isValidNumber(req, res, next) {
   console.log(" line 116 isvalidnumber");
@@ -141,21 +151,23 @@ function isValidNumber(req, res, next) {
   next();
 }
 
-// function hasReservationId(req, res, next) {
-//   const reservation = req.params.reservation_id || req.body.data.reservation_id;
-
-//   if (reservation) {
-//     next();
-//   } else {
-//     next({
-//       status: 400,
-//       message: `missing reservation_id`,
-//     });
-//   }
-// }
+function hasReservationId(req, res, next) {
+  const reservation = req.params.reservation_id || req.body.data.reservation_id;
+  console.log("147 reservation", reservation);
+  if (reservation) {
+    res.locals.reservation_id = reservation;
+    return next();
+  } else {
+    return next({
+      status: 400,
+      message: `missing reservation_id`,
+    });
+  }
+}
 
 async function reservationExists(req, res, next) {
   const { reservationId } = req.params;
+  console.log("160 reservationId", reservationId);
   const reservation = await service.read(Number(reservationId));
   if (reservation) {
     res.locals.reservation = reservation;
@@ -171,7 +183,7 @@ async function create(req, res) {
 }
 
 async function list(req, res) {
-  console.log("list ilne 128");
+  console.log("list line 128");
   const data = await service.list(req.query.date);
 
   res.json({
@@ -184,6 +196,16 @@ async function read(req, res) {
   res.status(200).json({
     data: reservation,
   });
+}
+
+async function status(req, res) {
+  res.locals.reservation.status = req.body.data.status;
+  console.log(
+    "192  res.locals.reservation.status",
+    res.locals.reservation.status
+  );
+  const data = await service.status(Number(res.locals.reservation));
+  res.json({ data });
 }
 
 module.exports = {
@@ -199,9 +221,15 @@ module.exports = {
     isTime,
     duringOperatingHours,
     isValidNumber,
-    // checkStatus,
+    checkStatus,
     asyncErrorBoundary(create),
   ],
   list: [asyncErrorBoundary(list)],
   read: [reservationExists, asyncErrorBoundary(read)],
+  status: [
+    hasReservationId,
+    reservationExists,
+    unfinishedStatus,
+    asyncErrorBoundary(status),
+  ],
 };
