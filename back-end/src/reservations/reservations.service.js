@@ -5,7 +5,7 @@ const tableName = "reservations";
 function list(date) {
   return knex(tableName)
     .select("*")
-    .where({ reservation_date: date })
+    .where("reservation_date", date)
     .whereNotIn("status", ["finished", "cancelled"])
     .orderBy("reservation_time");
 }
@@ -23,6 +23,7 @@ function read(reservationId) {
 }
 
 function status(reservation) {
+  console.log("26from status reservation", reservation);
   update(reservation);
   return validStatus(reservation);
 }
@@ -51,3 +52,8 @@ module.exports = {
   read,
   status,
 };
+
+/*
+
+TODO: do a test with a good id and bad id and undefined id  etc USE postman
+*/

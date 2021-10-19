@@ -52,23 +52,23 @@ function isValidDate(req, res, next) {
   const reservationDateTime = new Date(
     `${data.reservation_date}T${data.reservation_time}`
   );
-  console.log("line49 reservationDateTime", reservationDateTime);
-  // const reservation_date = new Date(data["reservation_date"]);
+  // console.log("line49 reservationDateTime", reservationDateTime);
+  // // const reservation_date = new Date(data["reservation_date"]);
   const day = reservationDateTime.getUTCDay();
-  console.log("51 day ", day);
-  console.log("52 reservation_date", data.reservation_date);
-  console.log("53 new Date()", new Date());
-  console.log("54 day", day);
+  // console.log("51 day ", day);
+  // console.log("52 reservation_date", data.reservation_date);
+  // console.log("53 new Date()", new Date());
+  // console.log("54 day", day);
   if (isNaN(Date.parse(data["reservation_date"]))) {
-    console.log("56 isNaN");
+    // console.log("56 isNaN");
     return next({ status: 400, message: `Invalid reservation_date` });
   }
   if (day === 2) {
-    console.log("60 day =2");
+    // console.log("60 day =2");
     return next({ status: 400, message: `Restaurant is closed on Tuesdays` });
   }
   if (reservationDateTime < Date.now()) {
-    console.log("64 reservationDateTime < Date.now()");
+    // console.log("64 reservationDateTime < Date.now()");
     return next({
       status: 400,
       message: `Reservation must be set in the future`,
@@ -127,7 +127,8 @@ function checkStatus(req, res, next) {
   }
   next();
 }
-async function unfinishedStatus(req, res, next) {
+function unfinishedStatus(req, res, next) {
+  console.log("unfinishedStatus");
   if ("booked" !== res.locals.reservation.status) {
     next({
       status: 400,
@@ -151,7 +152,7 @@ function isValidNumber(req, res, next) {
 }
 
 function hasReservationId(req, res, next) {
-  const reservation = req.params.reservation_id || req.body.data.reservation_id;
+  const reservation = req.params.reservation_id;
   console.log("147 reservation", reservation);
   if (reservation) {
     if (isNaN(reservation)) {
@@ -172,7 +173,8 @@ function hasReservationId(req, res, next) {
 }
 
 async function reservationExists(req, res, next) {
-  const reservationId = req.params.reservationId;
+  const reservationId = res.locals.reservation_id;
+  console.log("177 reservation", reservationId);
   const reservation = await service.read(Number(reservationId));
   if (reservation) {
     res.locals.reservation = reservation;
@@ -194,7 +196,7 @@ async function create(req, res, next) {
 }
 
 async function list(req, res) {
-  console.log("list line 128");
+  console.log("req.query.date", req.query.date);
   const data = await service.list(req.query.date);
 
   res.json({
@@ -214,7 +216,7 @@ async function update(req, res) {
     "204  res.locals.reservation.status",
     res.locals.reservation.status
   );
-  const data = await service.update(Number(res.locals.reservation));
+  const data = await service.status(Number(res.locals.reservation));
   res.json({ data });
 }
 

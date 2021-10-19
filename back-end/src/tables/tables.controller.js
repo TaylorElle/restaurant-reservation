@@ -75,6 +75,7 @@ function tableIsBigEnough(req, res, next) {
 
 function tableIsFree(req, res, next) {
   const { table } = res.locals;
+  console.log(table);
   if (!table.reservation_id) {
     return next();
   }
@@ -198,12 +199,13 @@ async function update(req, res) {
   const { table, resId, resStatus } = res.locals;
   const updatedTable = { ...table };
   const data = await service.update(updatedTable, resId, resStatus);
-  res.json({ data });
+  res.status(200).json({ data });
 }
 
 //! CRUDL ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 module.exports = {
+  list: asyncErrorBoundary(list),
   create: [
     hasOnlyValidProperties,
     hasRequiredProperties,
@@ -228,5 +230,4 @@ module.exports = {
     deOccupyTable,
     asyncErrorBoundary(update),
   ],
-  list: asyncErrorBoundary(list),
 };
