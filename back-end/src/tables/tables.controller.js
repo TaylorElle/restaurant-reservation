@@ -5,8 +5,10 @@ const hasProperties = require("../errors/hasProperties");
 
 //* Validation vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
+// asyncfunction hasData (req, res, eext)
+
 async function hasReservationId(req, res, next) {
-  if (req.body?.data?.reservation_id) {
+  if (req.body.data.reservation_id) {
     return next();
   }
   next({
@@ -219,4 +221,3 @@ module.exports = {
   ],
   list: asyncErrorBoundary(list),
 };
-
