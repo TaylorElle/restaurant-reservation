@@ -9,7 +9,7 @@ import ErrorAlert from "../layout/ErrorAlert";
 import Reservations from "./Reservations";
 import useQuery from "../utils/useQuery";
 import Tables from "./Tables";
-import DateNavigation from "./DateNavigation";
+// import DateNavigation from "./DateNavigation";
 
 /**
  * Defines the dashboard page.
@@ -70,7 +70,7 @@ function Dashboard({ date }) {
     return () => abortController.abort();
   }
 
-  const displayDateLong = formatDisplayDate(date, "long");
+  // const displayDateLong = formatDisplayDate(date, "long");
 
   // function onFinish(table_id, reservation_id) {
   //   finishTable(table_id, reservation_id).then(loadDashboard);
@@ -78,33 +78,17 @@ function Dashboard({ date }) {
 
   return (
     <main>
-      <div className="row">
-        <div className="col-12 mx-auto my-3">
-          <h2 className="mb-0 text-center">{displayDateLong}</h2>
-          <DateNavigation date={date} />
-        </div>
+      <h1>Dashboard</h1>
+      <div className="d-md-flex mb-3">
+        <h4 className="mb-0">Reservations for: {date}</h4>
       </div>
-      <div className="row">
-        <div className="col-md-12 mx-auto">
-          <fieldset className="border border-bottom-0 border-dark p-3 m-0">
-            <legend className="pl-2 shadow bg-dark rounded sticky-top">
-              <CurrentTime sectionTitle={"Reservations"} />
-            </legend>
-            <ReservationsList reservations={reservations} />
-            <ErrorAlert error={reservationsError} />
-          </fieldset>
-        </div>
-      </div>
-      <div className="row mt-3">
-        <div className="col-md-12 mx-auto">
-          <fieldset className="border border-bottom-0 border-dark p-3 m-0">
-            <legend className="pl-2 text-white shadow bg-dark rounded sticky-top">
-              Tables
-            </legend>
-            <TablesList tables={tables} />
-            <ErrorAlert error={tablesError} />
-          </fieldset>
-        </div>
+      <Reservations reservations={reservations} />
+      <ErrorAlert error={reservationsError} />
+
+      <div className="d-md-flex mb-3">
+        <h4 className="mb-0">Tables</h4>
+        <Tables tables={tables} />
+        <ErrorAlert error={tablesError} />
       </div>
     </main>
   );
