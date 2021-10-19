@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { listReservations, listTables } from "../utils/api";
+import {
+  listReservations,
+  listTables,
+  finishTable,
+  cancelReservation,
+} from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import Reservations from "./Reservations";
 import useQuery from "../utils/useQuery";
@@ -32,6 +37,15 @@ function Dashboard({ date }) {
 
     return () => abortController.abort();
   }
+  // function onCancel(reservation_id) {
+  //   cancelReservation(reservation_id)
+  //     .then(loadDashboard)
+  //     .catch(setReservationsError);
+  // }
+
+  function onFinish(table_id, reservation_id) {
+    finishTable(table_id, reservation_id).then(loadDashboard);
+  }
 
   return (
     <main>
@@ -44,7 +58,7 @@ function Dashboard({ date }) {
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Tables</h4>
       </div>
-      <Tables tables={tables} />
+      <Tables tables={tables} onFinish={onFinish} />
     </main>
   );
 }

@@ -1,20 +1,20 @@
 import React from "react";
 
 function Tables({ onFinish, tables = [] }) {
-  // function finishHandler({
-  //   target: { dataset: { tableIdFinish, reservationIdFinish } } = {},
-  // }) {
-  //   if (
-  //     tableIdFinish &&
-  //     reservationIdFinish &&
-  //     window.confirm(
-  //       "Is this table ready to seat new guests? This cannot be undone."
-  //     )
-  //   ) {
-  //     //finishTable(tableIdFinish, reservationIdFinish);
-  //     onFinish(tableIdFinish, reservationIdFinish);
-  //   }
-  // }
+  function finishHandler({
+    target: { dataset: { tableIdFinish, reservationIdFinish } } = {},
+  }) {
+    if (
+      tableIdFinish &&
+      reservationIdFinish &&
+      window.confirm(
+        "Is this table ready to seat new guests? This cannot be undone."
+      )
+    ) {
+      //finishTable(tableIdFinish, reservationIdFinish);
+      onFinish(tableIdFinish, reservationIdFinish);
+    }
+  }
 
   const rows = tables.length ? (
     tables.map((table) => {
@@ -32,6 +32,7 @@ function Tables({ onFinish, tables = [] }) {
                 className="btn"
                 data-table-id-finish={table.table_id}
                 data-reservation-id-finish={table.reservation_id}
+                onClick={finishHandler}
               >
                 Finish
               </button>

@@ -21,15 +21,15 @@ function Reservations({ reservations = [] }) {
             {reservation.status}
           </div>
 
-          {reservation.status === "booked" ? (
-            <div className="col-sm-1">
-              <a
-                className="btn btn-secondary mr-1"
-                href={`/reservations/${reservation.reservation_id}/seat`}
-              >
-                seat
-              </a>
-              {/* <a
+          {/* {reservation.status === "booked" ?  */}
+          <div className="col-sm-1">
+            <a
+              className="btn btn-secondary mr-1"
+              href={`/reservations/${reservation.reservation_id}/seat`}
+            >
+              seat
+            </a>
+            {/* <a
                 className="btn btn-secondary mr-1"
                 href={`/reservations/${reservation.reservation_id}/edit`}
               >
@@ -41,10 +41,8 @@ function Reservations({ reservations = [] }) {
               >
                 cancel
               </a> */}
-            </div>
-          ) : (
-            ""
-          )}
+          </div>
+          {/* } */}
         </div>
       );
     })
