@@ -196,11 +196,16 @@ async function create(req, res, next) {
 }
 
 async function list(req, res) {
-  // console.log("req.query.date", req.query.date);
-  const data = await service.list(req.query.date);
-  res.json({
-    data: data,
-  });
+  const { date, mobile_number } = req.query;
+  if (date) {
+    return res.json({
+      data: await service.list(date),
+    });
+  } else {
+    return res.json({
+      data: await service.search(mobile_number),
+    });
+  }
 }
 
 async function read(req, res, next) {

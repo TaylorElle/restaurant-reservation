@@ -1,5 +1,5 @@
 import React from "react";
-import { a } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Reservations({ reservations = [] }) {
   const rows = reservations.length ? (
@@ -21,28 +21,30 @@ function Reservations({ reservations = [] }) {
             {reservation.status}
           </div>
 
-          {/* {reservation.status === "booked" ?  */}
-          <div className="col-sm-1">
-            <a
-              className="btn btn-secondary mr-1"
-              href={`/reservations/${reservation.reservation_id}/seat`}
-            >
-              seat
-            </a>
-            {/* <a
-                className="btn btn-secondary mr-1"
-                href={`/reservations/${reservation.reservation_id}/edit`}
+          {reservation.status === "booked" ? (
+            <div className="col-sm-1">
+              <Link
+                className="btn"
+                to={`/reservations/${reservation.reservation_id}/seat`}
+              >
+                seat
+              </Link>
+              {/* <Link
+                className="btn"
+                to={`/reservations/${reservation.reservation_id}/edit`}
               >
                 edit
-              </a>
-              <a
-                className="btn btn-danger"
-                href={`/reservations/${reservation.reservation_id}/cancel`}
+              </Link>
+              <Link
+                className="btn"
+                to={`/reservations/${reservation.reservation_id}/cancel`}
               >
                 cancel
-              </a> */}
-          </div>
-          {/* } */}
+              </Link> */}
+            </div>
+          ) : (
+            ""
+          )}
         </div>
       );
     })
