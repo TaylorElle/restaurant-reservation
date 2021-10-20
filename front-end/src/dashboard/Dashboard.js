@@ -18,11 +18,15 @@ import Tables from "./Tables";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date }) {
-  const dateInUrl = useQuery().get("date");
-  if (dateInUrl) {
-    date = dateInUrl;
-  }
+function Dashboard() {
+  const query = useQuery();
+  const date = query.get("date") ? query.get("date") : today();
+  console.log("date", date);
+
+  // const dateInUrl = useQuery().get("date");
+  // if (dateInUrl) {
+  //   date = dateInUrl;
+  // }
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const [tables, setTables] = useState([]);

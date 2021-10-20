@@ -20,9 +20,9 @@ function ReservationForm() {
   const [error, setError] = useState(null);
 
   function changeHandler({ target: { name, value } }) {
-    // if (name === "people" && typeof value === "string") {
-    //   value = +value;
-    // }
+    if (name === "people" && typeof value === "string") {
+      value = +value;
+    }
     setReservation((prevState) => ({
       ...prevState,
       [name]: value,
@@ -144,7 +144,7 @@ function ReservationForm() {
               onChange={changeHandler}
               value={reservation.first_name}
               placeholder="John"
-              required="required"
+              required={true}
               className="form-control"
             />
           </label>
@@ -159,7 +159,7 @@ function ReservationForm() {
             onChange={changeHandler}
             value={reservation.last_name}
             placeholder="Smith"
-            required="required"
+            required={true}
             className="form-control"
           ></input>
         </div>
@@ -174,7 +174,7 @@ function ReservationForm() {
             value={reservation.mobile_number}
             placeholder="xxx-xxx-xxxx or xxx-xxxx"
             pattern="([0-9]{3}-)?[0-9]{3}-[0-9]{4}"
-            required="required"
+            required={true}
             className="form-control"
           ></input>
         </div>
@@ -189,7 +189,7 @@ function ReservationForm() {
             type="date"
             placeholder="YYYY-MM-DD"
             pattern="\d{4}-\d{2}-\d{2}"
-            required="required"
+            required={true}
             className="form-control"
           ></input>
         </div>
@@ -204,7 +204,7 @@ function ReservationForm() {
             type="time"
             placeholder="HH:MM"
             pattern="[0-9]{2}:[0-9]{2}"
-            required="required"
+            required={true}
             className="form-control"
           />
         </div>
@@ -218,7 +218,7 @@ function ReservationForm() {
             value={reservation.people}
             type="number"
             min="1"
-            required="required"
+            required={true}
             className="form-control"
           ></input>
         </div>
@@ -226,7 +226,7 @@ function ReservationForm() {
         <button type="submit" className="btn btn-primary">
           Submit
         </button>
-        {/* //TODO: allow someone to click cancel without anything in the form  */}
+        {/* allow someone to click cancel without anything in the form  */}
         <button
           type="button"
           className="btn btn-danger"

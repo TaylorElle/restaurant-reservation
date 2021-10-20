@@ -7,7 +7,7 @@ function ReservationErrors({ errors = [] }) {
         <div className="alert alert-danger">
           Error:
           {errors.map((error) => (
-            <p key={error.message}>{error.message}</p>
+            <p key={error.index}>{error.message}</p>
           ))}
         </div>
       );

@@ -76,7 +76,7 @@ function validateFields(req, res, next) {
     });
   }
 
-  if (reserveDate.getDay() < 2) {
+  if (reserveDate.getDay() === 1) {
     return next({
       status: 400,
       message:
@@ -158,15 +158,16 @@ async function list(req, res) {
 }
 
 async function create(req, res) {
-  const makeRest = ({
-    first_name,
-    last_name,
-    mobile_number,
-    reservation_date,
-    reservation_time,
-    people,
-  } = req.body.data);
-  const createdRest = await service.create(makeRest);
+  const data = req.body.data;
+  // const makeRest = ({
+  //   first_name,
+  //   last_name,
+  //   mobile_number,
+  //   reservation_date,
+  //   reservation_time,
+  //   people,
+  // } = req.body.data);
+  const createdRest = await service.create(data);
   res.status(201).json({ data: createdRest });
 }
 
