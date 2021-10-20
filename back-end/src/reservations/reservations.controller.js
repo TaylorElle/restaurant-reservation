@@ -72,7 +72,7 @@ function validateFields(req, res, next) {
   if (!/\d{4}-\d{2}-\d{2}/.test(data.reservation_date)) {
     return next({
       status: 400,
-      message: "Reservation_date is not a date.",
+      message: "reservation_date",
     });
   }
 
@@ -179,7 +179,7 @@ async function updateStatus(req, res) {
   const reservation_id = req.params.reservation_id;
   const status = req.body.data.status;
 
-  const updateStatus = await service.update(reservation_id, status);
+  const updateStatus = await service.updateStatus(reservation_id, status);
   res.status(200).json({ data: updateStatus });
 }
 

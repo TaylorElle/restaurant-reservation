@@ -6,6 +6,8 @@ import {
   cancelReservation,
 } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
+import { previous, today, next } from "../utils/date-time";
+
 import Reservations from "./Reservations";
 import useQuery from "../utils/useQuery";
 import Tables from "./Tables";
@@ -55,6 +57,30 @@ function Dashboard({ date }) {
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Reservations for: {date}</h4>
       </div>
+      {/*//////////// PREVIOUS //////////////*/}
+      <button
+        className="btn btn-info m-1 p-3"
+        onClick={() => history.push(`/dashboard?date=${previous(date)}`)}
+      >
+        Previous
+      </button>
+
+      {/*//////////// TODAY //////////////*/}
+      <button
+        className="btn btn-dark m-1 p-3"
+        onClick={() => history.push(`/dashboard?date=${today()}`)}
+      >
+        Today
+      </button>
+
+      {/*//////////// NEXT //////////////*/}
+      <button
+        className="btn btn-info m-1 p-3"
+        onClick={() => history.push(`/dashboard?date=${next(date)}`)}
+      >
+        Next
+      </button>
+
       <ErrorAlert error={reservationsError} />
       <Reservations reservations={reservations} onCancel={onCancel} />
       <div className="d-md-flex mb-3">

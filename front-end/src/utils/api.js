@@ -71,13 +71,16 @@ export async function listReservations(params, signal) {
 // posts a new reservation to the database
 export async function postReservation(reservation, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`);
+  reservation.people = Number(reservation.people);
   const options = {
     method: "POST",
     headers,
     body: JSON.stringify({ data: reservation }),
     signal,
   };
-  return await fetchJson(url, options, []);
+  return await fetchJson(url, options)
+    .then(formatReservationDate)
+    .then(formatReservationTime);
 }
 
 export async function createTable(table, signal) {
@@ -135,6 +138,19 @@ export async function readReservation(reservation_id, signal) {
     .then(formatReservationTime);
 }
 
+export async function updateTable(table_id, reservation_id, signal) {
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+  return await fetchJson(
+    url,
+    {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({ data: { reservation_id } }),
+      signal,
+    },
+    []
+  );
+}
 export async function updateReservation(reservation, signal) {
   const { reservation_date, reservation_time, reservation_id } = reservation;
   const url = `${API_BASE_URL}/reservations/${reservation_id}`;

@@ -20,25 +20,15 @@ function ReservationForm() {
   const [error, setError] = useState(null);
 
   function changeHandler({ target: { name, value } }) {
-    if (name === "people" && typeof value === "string") {
-      value = +value;
-    }
+    // if (name === "people" && typeof value === "string") {
+    //   value = +value;
+    // }
     setReservation((prevState) => ({
       ...prevState,
       [name]: value,
     }));
     console.log(reservation);
   }
-
-  // function changeHandlerNum({ target: { name, value } }) {
-  //   if (name === "people" && typeof value === "string") {
-  //     value = +value;
-  //   }
-  //   setReservation((prevState) => ({
-  //     ...prevState,
-  //     [name]: value,
-  //   }));
-  // }
 
   function validate(reservation) {
     const errors = [];
@@ -83,7 +73,7 @@ function ReservationForm() {
         (reservationDateTime.getHours() === 10 &&
           reservationDateTime.getMinutes() < 30)
       ) {
-        errors.push(new Error("Restaurant is only open after 10:30 am"));
+        errors.push(new Error("Restaurant is only open after 10:30am"));
       }
       //should push an error if ANY time is AFTER 9:30pm but before 10:30
       else if (
@@ -91,7 +81,9 @@ function ReservationForm() {
         reservationDateTime.getMinutes() > 30
       ) {
         errors.push(
-          new Error("Reservation must be made at least 1 hour before closing")
+          new Error(
+            "Reservation must be made at least 1 hour before closing time (10:30pm)"
+          )
         );
       }
       // should push an error if ANY time is AFTER 10:30pm
