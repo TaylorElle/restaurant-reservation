@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { listReservations, listTables, finishTable } from "../utils/api";
+import {
+  listReservations,
+  listTables,
+  finishTable,
+  cancelReservation,
+} from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 import Reservations from "./Reservations";
 import useQuery from "../utils/useQuery";
@@ -34,6 +39,12 @@ function Dashboard({ date }) {
     return () => abortController.abort();
   }
 
+  function onCancel(reservation_id) {
+    cancelReservation(reservation_id)
+      .then(loadDashboard)
+      .catch(setReservationsError);
+  }
+
   function onFinish(table_id, reservation_id) {
     finishTable(table_id, reservation_id).then(loadDashboard);
   }
@@ -45,7 +56,7 @@ function Dashboard({ date }) {
         <h4 className="mb-0">Reservations for: {date}</h4>
       </div>
       <ErrorAlert error={reservationsError} />
-      <Reservations reservations={reservations} />
+      <Reservations reservations={reservations} onCancel={onCancel} />
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Tables</h4>
       </div>

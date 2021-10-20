@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router";
-import { listTables, readReservation, seatReservation } from "../utils/api";
+import {
+  listTables,
+  readReservation,
+  seatReservation,
+  updateTable,
+} from "../utils/api";
 
 function ReservationSeat() {
   const history = useHistory();
@@ -24,7 +29,7 @@ function ReservationSeat() {
 
   function submitHandler(event) {
     event.preventDefault();
-    seatReservation(reservation.reservation_id, tableId).then(() =>
+    updateTable(reservation.reservation_id, tableId).then(() =>
       history.push("/dashboard")
     );
   }
