@@ -2,69 +2,54 @@ const knex = require("../db/connection");
 
 const tableName = "reservations";
 
-function list(date) {
+function list(reservation_date) {
   return knex(tableName)
     .select("*")
-    .where("reservation_date", date)
-    .whereNotIn("status", ["finished", "cancelled"])
-    .orderBy("reservation_time");
+    .where({ reservation_date })
+    .whereNot({ status: "finished" })
+    .orderBy("reservation_time", "asc");
 }
 
-function create(reservation) {
+function create(newReservation) {
   return knex(tableName)
-    .insert(reservation, "*")
-    .then((createdRecords) => createdRecords[0]);
+    .insert(newReservation, "*")
+    .then((createdReservation) => createdReservation[0]);
 }
 
-function read(reservationId) {
+function read(reservation_id) {
+  return knex(tableName).where({ reservation_id }).first();
+}
+
+function updateStatus(reservation_id, status) {
   return knex(tableName)
-    .where({ reservation_id: reservationId })
-    .then((records) => records[0]);
+    .where({ reservation_id })
+    .update("status", status)
+    .returning("*")
+    .then((updatedResult) => updatedResult[0]);
 }
 
-function status(reservation) {
-  // console.log("26from status reservation", reservation);
-  update(reservation);
-  return validStatus(reservation);
-}
-
-function update(updatedReservation) {
+function updateReservation(reservation) {
   return knex(tableName)
-    .where({ reservation_id: updatedReservation.reservation_id })
-    .update(updatedReservation, "*")
-    .then((updatedReservations) => updatedReservations[0]);
+    .select("*")
+    .where({ reservation_id: reservation.reservation_id })
+    .update(reservation, "*")
+    .then((updatedResult) => updatedResult[0]);
 }
 
-function validStatus(reservation) {
-  if (
-    ["booked", "seated", "finished", "cancelled"].includes(reservation.status)
-  ) {
-    return reservation;
-  }
-  const error = new Error(`Invalid status:"${reservation.status}"`);
-  error.status = 400;
-  throw error;
-}
-
-function search(mobile_number) {
+function search(mobile_phone) {
   return knex(tableName)
     .whereRaw(
       "translate(mobile_number, '() -', '') like ?",
-      `%${mobile_number.replace(/\D/g, "")}%`
+      `%${mobile_phone.replace(/\D/g, "")}%`
     )
     .orderBy("reservation_date");
 }
-
-
 
 module.exports = {
   create,
   list,
   read,
-  status,
+  updateStatus,
+  updateReservation,
   search,
 };
-
-/*
-TODO: do a test with a good id and bad id and undefined id  etc USE postman
-*/
