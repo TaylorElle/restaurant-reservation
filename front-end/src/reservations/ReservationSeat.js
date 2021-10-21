@@ -8,7 +8,6 @@ function ReservationSeat() {
   const history = useHistory();
   const { reservation_id } = useParams();
 
-  const [reservation, setReservation] = useState({});
   const [tables, setTables] = useState([]);
   const [tableId, setTableId] = useState("");
   const [errors, setErrors] = useState(null);
@@ -17,10 +16,6 @@ function ReservationSeat() {
   useEffect(() => {
     listTables().then(setTables);
   }, []);
-
-  // useEffect(() => {
-  //   readReservation(reservation_id).then(setReservation);
-  // }, [reservation_id]);
 
   function validateSeat() {
     if (!tableId) {
@@ -50,6 +45,8 @@ function ReservationSeat() {
   }
 
   async function submitHandler(event) {
+    const abortController = new window.AbortController();
+
     event.preventDefault();
     setErrors(null);
 
@@ -58,10 +55,10 @@ function ReservationSeat() {
         .then(() => listTables())
         .then(setTables)
         .then(() => listReservations({ date: today() }))
-        .then(setReservation)
         .then(() => history.push("/dashboard"))
         .catch(setErrors);
     }
+    return () => abortController.abort();
   }
 
   return (

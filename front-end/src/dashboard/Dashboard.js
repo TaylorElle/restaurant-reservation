@@ -18,10 +18,10 @@ import Tables from "./Tables";
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard() {
+function Dashboard({ date }) {
   const query = useQuery();
-  const date = query.get("date") ? query.get("date") : today();
-  console.log("date", date);
+  // const date = query.get("date") ? query.get("date") : today();
+  // console.log("date", date);
 
   // const dateInUrl = useQuery().get("date");
   // if (dateInUrl) {
@@ -72,7 +72,7 @@ function Dashboard() {
       {/*//////////// TODAY //////////////*/}
       <button
         className="btn btn-dark m-1 p-3"
-        onClick={() => history.push(`/dashboard?date=${today()}`)}
+        onClick={() => history.push(`/dashboard?date=${today}`)}
       >
         Today
       </button>

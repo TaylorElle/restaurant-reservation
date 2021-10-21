@@ -13,10 +13,7 @@ function Search() {
 
   function submitHandler(event) {
     event.preventDefault();
-    search();
-  }
 
-  function search() {
     setShowResults(false);
     listReservations({ mobile_number: mobileNumber })
       .then(setReservations)

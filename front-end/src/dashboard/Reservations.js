@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 function Reservations({ onCancel, reservations = [] }) {
   function cancelHandler({
@@ -35,18 +35,18 @@ function Reservations({ onCancel, reservations = [] }) {
 
           {reservation.status === "booked" ? (
             <div className="col-sm-1">
-              <Link
+              <a
                 className="btn"
-                to={`/reservations/${reservation.reservation_id}/seat`}
+                href={`/reservations/${reservation.reservation_id}/seat`}
               >
                 Seat
-              </Link>
-              <Link
+              </a>
+              <a
                 className="btn"
-                to={`/reservations/${reservation.reservation_id}/edit`}
+                href={`/reservations/${reservation.reservation_id}/edit`}
               >
                 Edit
-              </Link>
+              </a>
 
               <button
                 type="button"

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { postReservation } from "../utils/api";
 import ReservationErrors from "./ReservationError";
-import { today } from "../utils/date-time.js";
+// import { today } from "../utils/date-time.js";
 
 function ReservationForm() {
   const history = useHistory();
@@ -27,28 +27,28 @@ function ReservationForm() {
       ...prevState,
       [name]: value,
     }));
-    console.log(reservation);
+    // console.log(reservation);
   }
 
   function validate(reservation) {
     const errors = [];
-    console.log(errors);
+    // console.log(errors);
 
     function isFutureDate({ reservation_date, reservation_time }) {
       //reservation date
       const reservationDateTime = new Date(
         `${reservation_date}T${reservation_time}`
       );
-      console.log("reservationDateTime line 50", reservationDateTime);
-      //date right now = new Date()
-      console.log(
-        reservationDateTime,
-        "---",
-        new Date(),
-        "-------->>>today",
-        today()
-      );
-      console.log("date now()", Date.now());
+      // console.log("reservationDateTime line 50", reservationDateTime);
+      // //date right now = new Date()
+      // console.log(
+      //   reservationDateTime,
+      //   "---",
+      //   new Date(),
+      //   "-------->>>today",
+      //   today()
+      // );
+      // console.log("date now()", Date.now());
       //if reservation date is less than date right now,
       if (reservationDateTime < new Date()) {
         errors.push(new Error("Reservation must be set in the future"));
@@ -97,11 +97,11 @@ function ReservationForm() {
     }
 
     isFutureDate(reservation);
-    console.log(isFutureDate(reservation));
+    // console.log(isFutureDate(reservation));
     isTuesday(reservation);
-    console.log(isTuesday(reservation));
+    // console.log(isTuesday(reservation));
     isOpenHours(reservation);
-    console.log(isOpenHours(reservation));
+    // console.log(isOpenHours(reservation));
 
     return errors;
   }
@@ -111,7 +111,7 @@ function ReservationForm() {
     const abortController = new window.AbortController();
     event.preventDefault();
     const reservationError = validate(reservation);
-    console.log(reservationError);
+    // console.log(reservationError);
     // do not send POST request if there is an error message
     if (reservationError.length) {
       return setError(reservationError);

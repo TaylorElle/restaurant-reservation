@@ -19,7 +19,7 @@ function hasReservationId(req, res, next) {
   if (req.body.data.reservation_id) {
     return next();
   }
-  next({
+  return next({
     status: 400,
     message: `reservation_id is missing from request`,
   });
@@ -32,7 +32,7 @@ async function reservationExists(req, res, next) {
     res.locals.reservation = reservation;
     return next();
   }
-  next({
+  return next({
     status: 404,
     message: `Reservation with id: ${reservation_id} was not found`,
   });
@@ -43,7 +43,7 @@ async function reservationIsBooked(req, res, next) {
   if (reservation.status !== "seated") {
     return next();
   }
-  next({
+  return next({
     status: 400,
     message: `Reservation is already 'seated'`,
   });
@@ -56,7 +56,7 @@ async function tableExists(req, res, next) {
     res.locals.table = table;
     return next();
   }
-  next({
+  return next({
     status: 404,
     message: `Table with id: ${table_id} was not found`,
   });
@@ -66,23 +66,23 @@ function tableIsBigEnough(req, res, next) {
   const tableCapacity = res.locals.table.capacity;
   const guests = res.locals.reservation.people;
   if (tableCapacity < guests) {
-    next({
+    return next({
       status: 400,
       message: `Too many guests ( ${guests} ) for table size. Please choose table with capacity.`,
     });
   } else {
-    next();
+    return next();
   }
 }
 
 function tableIsFree(req, res, next) {
   if (res.locals.table.reservation_id) {
-    next({
+    return next({
       status: 400,
       message: `Table id is occupied: ${res.locals.table.table_id}`,
     });
   } else {
-    next();
+    return next();
   }
 }
 
@@ -95,7 +95,7 @@ function occupyTable(req, res, next) {
   if (table.reservation_id) {
     return next();
   }
-  next({
+  return next({
     status: 400,
     message: `Table with id: ${table.table_id} could not be assigned reservation id ${table.reservation_id}  for some reason. Please contact backend engineer for assistance`,
   });
@@ -106,7 +106,7 @@ function tableIsOccupied(req, res, next) {
   if (table.reservation_id) {
     return next();
   }
-  next({
+  return next({
     status: 400,
     message: `Table with id: ${table.table_id} is not occupied`,
   });
@@ -120,7 +120,7 @@ function deOccupyTable(req, res, next) {
   if (!table.reservation_id) {
     return next();
   }
-  next({
+  return next({
     status: 400,
     message: `Table with id: ${table.table_id} could not remove reservation id ${table.reservation_id}  for some reason. Please contact backend engineer for assistance`,
   });
@@ -140,7 +140,7 @@ function hasOnlyValidProperties(req, res, next) {
       message: `Invalid field(s): ${invalidFields.join(", ")}`,
     });
   }
-  next();
+  return next();
 }
 
 const hasRequiredProperties = hasProperties(...["table_name", "capacity"]);
@@ -168,7 +168,7 @@ function hasValidValues(req, res, next) {
       message: "table_name must be more than one character",
     });
   }
-  next();
+  return next();
 }
 
 //! Validation ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
