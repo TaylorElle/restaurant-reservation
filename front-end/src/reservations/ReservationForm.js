@@ -103,32 +103,49 @@ function ReservationForm() {
     isOpenHours(reservation);
     // console.log(isOpenHours(reservation));
 
-    return errors;
+    if (errors.length) {
+      setError(errors);
+      return false;
+    }
+    return true;
+
+    // return errors;
+
+    //set the state
+    //dont return it
   }
 
   //submit handler
   function submitHandler(event) {
     const abortController = new window.AbortController();
     event.preventDefault();
-    const reservationError = validate(reservation);
+    setError(null);
+    const itValidated = validate(reservation);
     // console.log(reservationError);
     // do not send POST request if there is an error message
-    if (reservationError.length) {
-      return setError(reservationError);
-    }
-    // POST request (new reservation)
-    postReservation(reservation, abortController.signal)
-      .then(
-        () => history.push(`/dashboard?date=${reservation.reservation_date}`)
+    // if (reservationError.length) {
+    //   return setError(reservationError);
+    // }
+    //IF NO ERRORS, POST IT.
 
-        // const res_date =
-        //   createdReservation.reservation_date.match(/\d{4}-\d{2}-\d{2}/)[0];
-        // history.push(`/dashboard?date=` + res_date);
-      )
-      .catch(setError);
-    return () => abortController.abort();
+    if (itValidated) {
+      console.log(error);
+      // POST request (new reservation)
+      postReservation(reservation, abortController.signal)
+        .then(
+          () => history.push(`/dashboard?date=${reservation.reservation_date}`)
+
+          // const res_date =
+          //   createdReservation.reservation_date.match(/\d{4}-\d{2}-\d{2}/)[0];
+          // history.push(`/dashboard?date=` + res_date);
+        )
+        .catch(setError);
+      return () => abortController.abort();
+    }
+    console.log(error);
   }
 
+  //display errors if there's state
   return (
     <div>
       <form onSubmit={submitHandler}>
