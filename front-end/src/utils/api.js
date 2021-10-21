@@ -153,25 +153,33 @@ export async function updateTable(table_id, reservation_id, signal) {
 }
 export async function updateReservation(reservation, signal) {
   const { reservation_date, reservation_time, reservation_id } = reservation;
+  console.log(
+    "156 reservation_date, reservation_time, reservation_id ",
+    reservation_date,
+    reservation_time,
+    reservation_id
+  );
   const url = `${API_BASE_URL}/reservations/${reservation_id}`;
+  console.log("url", url);
 
-  const data = {
-    ...reservation,
-    reservation_date: Array.isArray(reservation_date)
-      ? reservation_date[0]
-      : reservation_date,
-    reservation_time: Array.isArray(reservation_time)
-      ? reservation_time[0]
-      : reservation_time,
-  };
+  // const data = {
+  //   ...reservation,
+  //   reservation_date: Array.isArray(reservation_date)
+  //     ? reservation_date[0]
+  //     : reservation_date,
+  //   reservation_time: Array.isArray(reservation_time)
+  //     ? reservation_time[0]
+  //     : reservation_time,
+  // };
+  console.log("data", reservation);
 
   const options = {
     method: "PUT",
     headers,
-    body: JSON.stringify({ data }),
+    body: JSON.stringify({ data: reservation }),
     signal,
   };
-  const response = await fetchJson(url, options, reservation);
+  return await fetchJson(url, options, reservation);
 
-  return Array.isArray(response) ? response[0] : response;
+  // return Array.isArray(response) ? response[0] : response;
 }

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { readReservation, updateReservation } from "../utils/api";
 import ReservationErrors from "./ReservationError";
+import { today } from "../utils/date-time.js";
 
 function ReservationEdit() {
   const history = useHistory();
@@ -39,13 +40,27 @@ function ReservationEdit() {
       [name]: Number(value),
     }));
   }
-
   function validate(reservation) {
     const errors = [];
+    console.log(errors);
 
     function isFutureDate({ reservation_date, reservation_time }) {
-      const dt = new Date(`${reservation_date}T${reservation_time}`);
-      if (dt < new Date()) {
+      //reservation date
+      const reservationDateTime = new Date(
+        `${reservation_date}T${reservation_time}`
+      );
+      console.log("reservationDateTime line 50", reservationDateTime);
+      //date right now = new Date()
+      console.log(
+        reservationDateTime,
+        "---",
+        new Date(),
+        "-------->>>today",
+        today()
+      );
+      console.log("date now()", Date.now());
+      //if reservation date is less than date right now,
+      if (reservationDateTime < new Date()) {
         errors.push(new Error("Reservation must be set in the future"));
       }
     }
@@ -57,29 +72,89 @@ function ReservationEdit() {
       }
     }
 
-    function isOpenHours({ reservation_time }) {
-      const hour = parseInt(reservation_time.split(":")[0], 10);
-      const mins = parseInt(reservation_time.split(":")[1], 10);
+    function isOpenHours(reservation) {
+      const reservationDateTime = new Date(
+        `${reservation.reservation_date}T${reservation.reservation_time}:00.000`
+      );
 
-      if (hour <= 10 && mins <= 30) {
-        errors.push(new Error("Restaurant is only open after 10:30 am"));
+      // //should push an error if ANY time is before 10:30am
+      if (
+        reservationDateTime.getHours() < 10 ||
+        (reservationDateTime.getHours() === 10 &&
+          reservationDateTime.getMinutes() < 30)
+      ) {
+        errors.push(new Error("Restaurant is only open after 10:30am"));
       }
-
-      if (hour >= 22) {
-        errors.push(new Error("Restaurant is closed after 10:00 pm"));
+      //should push an error if ANY time is AFTER 9:30pm but before 10:30
+      else if (
+        reservationDateTime.getHours() === 21 &&
+        reservationDateTime.getMinutes() > 30
+      ) {
+        errors.push(
+          new Error(
+            "Reservation must be made at least 1 hour before closing time (10:30pm)"
+          )
+        );
+      }
+      // should push an error if ANY time is AFTER 10:30pm
+      else if (
+        reservationDateTime.getHours() >= 22 ||
+        (reservationDateTime.getHours() === 22 &&
+          reservationDateTime.getMinutes() >= 30)
+      ) {
+        errors.push(new Error("Restaurant closes at 10:30pm"));
       }
     }
 
     isFutureDate(reservation);
+    console.log(isFutureDate(reservation));
     isTuesday(reservation);
+    console.log(isTuesday(reservation));
     isOpenHours(reservation);
+    console.log(isOpenHours(reservation));
 
     return errors;
   }
+  // function validate(reservation) {
+  //   const errors = [];
+
+  //   function isFutureDate({ reservation_date, reservation_time }) {
+  //     const dt = new Date(`${reservation_date}T${reservation_time}`);
+  //     if (dt < new Date()) {
+  //       errors.push(new Error("Reservation must be set in the future"));
+  //     }
+  //   }
+
+  //   function isTuesday({ reservation_date }) {
+  //     const day = new Date(reservation_date).getUTCDay();
+  //     if (day === 2) {
+  //       errors.push(new Error("No reservations available on Tuesday."));
+  //     }
+  //   }
+
+  //   function isOpenHours({ reservation_time }) {
+  //     const hour = parseInt(reservation_time.split(":")[0], 10);
+  //     const mins = parseInt(reservation_time.split(":")[1], 10);
+
+  //     if (hour <= 10 && mins <= 30) {
+  //       errors.push(new Error("Restaurant is only open after 10:30 am"));
+  //     }
+
+  //     if (hour >= 22) {
+  //       errors.push(new Error("Restaurant is closed after 10:00 pm"));
+  //     }
+  //   }
+
+  //   isFutureDate(reservation);
+  //   isTuesday(reservation);
+  //   isOpenHours(reservation);
+
+  //   return errors;
+  // }
 
   function submitHandler(event) {
+    const abortController = new window.AbortController();
     event.preventDefault();
-    event.stopPropagation();
 
     const reservationErrors = validate(reservation);
 
@@ -88,13 +163,12 @@ function ReservationEdit() {
       return setError(reservationErrors);
     }
 
-    updateReservation({ reservation_id, ...reservation }).then(
-      (updatedReservation) => {
-        const res_date =
-          updatedReservation.reservation_date.match(/\d{4}-\d{2}-\d{2}/)[0];
-        history.push(`/dashboard?date=` + res_date);
-      }
-    );
+    updateReservation(reservation, abortController.signal)
+      .then(() =>
+        history.push(`/dashboard?date=${reservation.reservation_date}`)
+      )
+      .catch(setError);
+    return () => abortController.abort();
   }
 
   return (

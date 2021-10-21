@@ -30,6 +30,7 @@ function TableForm() {
   const [error, setError] = useState(null);
 
   function submitHandler(event) {
+    const abortController = new window.AbortController();
     event.preventDefault();
     setError(null);
 
@@ -38,16 +39,21 @@ function TableForm() {
         history.push(`/dashboard?date=${today()}`);
       })
       .catch(setError);
+    return () => abortController.abort();
   }
 
   return (
     <form onSubmit={submitHandler}>
       <TableErrors errors={error} />
       <div className="form-group row">
-        <label className="col-sm-2 col-form-label">Table name:</label>
+        <label htmlFor="table_name" className="col-sm-2 col-form-label">
+          Table name:
+        </label>
         <div className="col-sm-10">
           <input
+            id="table_name"
             name="table_name"
+            type="text"
             minLength={2}
             required={true}
             value={table.table_name}
@@ -56,9 +62,12 @@ function TableForm() {
         </div>
       </div>
       <div className="form-group row">
-        <label className="col-sm-2 col-form-label">Number of people:</label>
+        <label htmlFor="capacity" className="col-sm-2 col-form-label">
+          Number of people:
+        </label>
         <div className="col-sm-10">
           <input
+            id="capacity"
             name="capacity"
             type="number"
             min={1}
