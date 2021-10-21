@@ -159,14 +159,6 @@ async function list(req, res) {
 
 async function create(req, res) {
   const data = req.body.data;
-  // const makeRest = ({
-  //   first_name,
-  //   last_name,
-  //   mobile_number,
-  //   reservation_date,
-  //   reservation_time,
-  //   people,
-  // } = req.body.data);
   const createdRest = await service.create(data);
   res.status(201).json({ data: createdRest });
 }

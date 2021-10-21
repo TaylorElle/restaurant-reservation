@@ -9,8 +9,6 @@ import Search from "../search/Search";
 import ReservationEdit from "../reservations/ReservationEdit";
 
 import NotFound from "./NotFound";
-import { today } from "../utils/date-time";
-import useQuery from "../utils/useQuery";
 
 /**
  * Defines all the routes for the application.
@@ -20,8 +18,6 @@ import useQuery from "../utils/useQuery";
  * @returns {JSX.Element}
  */
 function Routes() {
-  const query = useQuery();
-
   return (
     <Switch>
       <Route exact={true} path="/">

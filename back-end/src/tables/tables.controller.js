@@ -6,7 +6,6 @@ const hasProperties = require("../errors/hasProperties");
 //* Validation vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
 function hasData(req, res, next) {
-  console.log("req.body.data", req.body.data);
   if (!req.body.data) {
     return next({
       status: 400,
@@ -17,7 +16,6 @@ function hasData(req, res, next) {
 }
 
 function hasReservationId(req, res, next) {
-  console.log("20 req.body.data.reservation_id", req.body.data.reservation_id);
   if (req.body.data.reservation_id) {
     return next();
   }
@@ -29,7 +27,6 @@ function hasReservationId(req, res, next) {
 
 async function reservationExists(req, res, next) {
   const { reservation_id } = req.body.data;
-  console.log("32 reservation_id", reservation_id);
   const reservation = await reservationsService.read(reservation_id);
   if (reservation) {
     res.locals.reservation = reservation;
@@ -43,7 +40,6 @@ async function reservationExists(req, res, next) {
 
 async function reservationIsBooked(req, res, next) {
   const reservation = res.locals.reservation;
-  console.log("46 reservation", reservation);
   if (reservation.status !== "seated") {
     return next();
   }
@@ -92,14 +88,10 @@ function tableIsFree(req, res, next) {
 
 function occupyTable(req, res, next) {
   const { table } = res.locals;
-  console.log("res.locals", res.locals);
-  console.log("94 occupy table table", table);
   const { reservation_id } = req.body.data;
-  console.log("96 occupyTable reservation_id", reservation_id);
   table.reservation_id = reservation_id;
   res.locals.resId = reservation_id;
   res.locals.resStatus = "seated";
-  console.log(" res.locals.resStatus", res.locals.resStatus);
   if (table.reservation_id) {
     return next();
   }
@@ -206,7 +198,6 @@ async function read(req, res) {
 //* resId and resStatus are coming from last middleware (occupy and deoccupy table) before update for BOTH adding and deleting reservation_ids from tables. They are needed for the knex transaction in tables.service.js
 async function update(req, res) {
   const { table, resId, resStatus } = res.locals;
-  console.log("table, resId, resStatus", table, resId, resStatus);
   const updatedTable = { ...table };
   const data = await service.update(updatedTable, resId, resStatus);
   res.status(200).json({ data });

@@ -25,13 +25,11 @@ function read(id) {
 async function update(updatedTable, resId, updatedResStatus) {
   try {
     await knex.transaction(async (trx) => {
-      // const returnedUpdatedTable =
-       await trx("tables")
+      await trx("tables")
         .where({ table_id: Number(updatedTable.table_id) })
         .update(updatedTable, "*")
         .then((updatedTables) => updatedTables[0]);
 
-      // const returnedUpdatedReservation = 
       await trx("reservations")
         .where({ reservation_id: Number(resId) })
         .update({ status: updatedResStatus }, "*")

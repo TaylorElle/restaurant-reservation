@@ -39,20 +39,15 @@ function Reservations({ onCancel, reservations = [] }) {
                 className="btn"
                 to={`/reservations/${reservation.reservation_id}/seat`}
               >
-                seat
+                Seat
               </Link>
               <Link
                 className="btn"
                 to={`/reservations/${reservation.reservation_id}/edit`}
               >
-                edit
+                Edit
               </Link>
-              <Link
-                className="btn"
-                to={`/reservations/${reservation.reservation_id}/cancel`}
-              >
-                cancel
-              </Link>
+
               <button
                 type="button"
                 className="btn cancel"
