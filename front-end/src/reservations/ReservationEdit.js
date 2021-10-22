@@ -7,6 +7,7 @@ import ReservationErrors from "./ReservationError";
 
 function ReservationEdit() {
   const history = useHistory();
+  const abortController = new window.AbortController();
 
   const { reservation_id } = useParams();
 
@@ -23,18 +24,23 @@ function ReservationEdit() {
 
   useEffect(() => {
     setError(null);
-    readReservation(reservation_id).then(setReservation).catch(setError);
+    readReservation(reservation_id, abortController.signal)
+      .then(setReservation)
+      .catch(setError);
   }, [reservation_id]);
 
   function changeHandler({ target: { name, value } }) {
-    if (name === "people" && typeof value === "string") {
-      value = +value;
-    }
     setReservation((prevState) => ({
       ...prevState,
       [name]: value,
     }));
-    // console.log(reservation);
+  }
+
+  function changeHandlerNum({ target: { name, value } }) {
+    setReservation((prevState) => ({
+      ...prevState,
+      [name]: Number(value),
+    }));
   }
 
   function validate(reservation) {
@@ -110,7 +116,16 @@ function ReservationEdit() {
     isOpenHours(reservation);
     // console.log(isOpenHours(reservation));
 
-    return errors;
+    if (errors.length) {
+      setError(errors);
+      return false;
+    }
+    return true;
+
+    // return errors;
+
+    //set the state
+    //dont return it
   }
   // function validate(reservation) {
   //   const errors = [];
@@ -152,130 +167,137 @@ function ReservationEdit() {
   function submitHandler(event) {
     const abortController = new window.AbortController();
     event.preventDefault();
+    event.preventPropogation();
+    setError(null);
+    const itValidated = validate(reservation);
 
-    const reservationErrors = validate(reservation);
-
-    console.log(reservationErrors);
-    if (reservationErrors.length) {
-      return setError(reservationErrors);
+    if (itValidated) {
+      updateReservation(reservation, abortController.signal)
+        .then(() =>
+          history.push(`/dashboard?date=${reservation.reservation_date}`)
+        )
+        .catch(setError);
+      return () => abortController.abort();
     }
 
-    updateReservation(reservation, abortController.signal)
-      .then(() =>
-        history.push(`/dashboard?date=${reservation.reservation_date}`)
-      )
-      .catch(setError);
-    return () => abortController.abort();
+    // if (reservationErrors.length) {
+    // console.log(reservationErrors);
+    //   return setError(reservationErrors);
+    // }
   }
 
   return (
-    <form onSubmit={submitHandler}>
-      <ReservationErrors errors={error} />
-      <div className="form-group row">
-        <label htmlFor="first_name" className="col-sm-2 col-form-label">
-          First name:
-        </label>
-        <div className="col-sm-10">
-          <input
-            id="first_name"
-            type="text"
-            name="first_name"
-            value={reservation.first_name}
-            onChange={changeHandler}
-            required={true}
-            className="form-control"
-          />
+    <div>
+      <form onSubmit={submitHandler}>
+        <div>
+          <ReservationErrors errors={error} />
         </div>
-      </div>
-      <div className="form-group row">
-        <label htmlFor="last_name" className="col-sm-2 col-form-label">
-          Last name:
-        </label>
-        <div className="col-sm-10">
-          <input
-            id="last_name"
-            type="text"
-            name="last_name"
-            value={reservation.last_name}
-            onChange={changeHandler}
-            required={true}
-            className="form-control"
-          />
+        <div className="form-group row">
+          <label htmlFor="first_name" className="col-sm-2 col-form-label">
+            First name:
+          </label>
+          <div className="col-sm-10">
+            <input
+              id="first_name"
+              type="text"
+              name="first_name"
+              value={reservation.first_name}
+              onChange={changeHandler}
+              required={true}
+              className="form-control"
+            />
+          </div>
         </div>
-      </div>
-      <div className="form-group row">
-        <label htmlFor="mobile_number" className="col-sm-2 col-form-label">
-          Phone Number
-        </label>
-        <div className="col-sm-10">
-          <input
-            id="mobile_number"
-            type="text"
-            name="mobile_number"
-            value={reservation.mobile_number}
-            pattern="([0-9]{3}-)?[0-9]{3}-[0-9]{4}"
-            onChange={changeHandler}
-            required={true}
-            className="form-control"
-          />
+        <div className="form-group row">
+          <label htmlFor="last_name" className="col-sm-2 col-form-label">
+            Last name:
+          </label>
+          <div className="col-sm-10">
+            <input
+              id="last_name"
+              type="text"
+              name="last_name"
+              value={reservation.last_name}
+              onChange={changeHandler}
+              required={true}
+              className="form-control"
+            />
+          </div>
         </div>
-      </div>
-      <div className="form-group row">
-        <label htmlFor="reservation_date" className="col-sm-2 col-form-label">
-          Reservation Date
-        </label>
-        <div className="col-sm-10">
-          <input
-            id="reservation_date"
-            name="reservation_date"
-            type="date"
-            pattern="\d{4}-\d{2}-\d{2}"
-            value={reservation.reservation_date}
-            onChange={changeHandler}
-            required={true}
-            className="form-control"
-          />
+        <div className="form-group row">
+          <label htmlFor="mobile_number" className="col-sm-2 col-form-label">
+            Phone Number
+          </label>
+          <div className="col-sm-10">
+            <input
+              id="mobile_number"
+              type="text"
+              name="mobile_number"
+              value={reservation.mobile_number}
+              pattern="([0-9]{3}-)?[0-9]{3}-[0-9]{4}"
+              onChange={changeHandler}
+              required={true}
+              className="form-control"
+            />
+          </div>
         </div>
-      </div>
-      <div className="form-group row">
-        <label htmlFor="reservation_time" className="col-sm-2 col-form-label">
-          Reservation Time
-        </label>
-        <div className="col-sm-10">
-          <input
-            id="reservation_time"
-            name="reservation_time"
-            type="time"
-            value={reservation.reservation_time}
-            pattern="[0-9]{2}:[0-9]{2}"
-            onChange={changeHandler}
-            required={true}
-            className="form-control"
-          />
+        <div className="form-group row">
+          <label htmlFor="reservation_date" className="col-sm-2 col-form-label">
+            Reservation Date
+          </label>
+          <div className="col-sm-10">
+            <input
+              id="reservation_date"
+              name="reservation_date"
+              type="date"
+              pattern="\d{4}-\d{2}-\d{2}"
+              value={reservation.reservation_date}
+              onChange={changeHandler}
+              required={true}
+              className="form-control"
+            />
+          </div>
         </div>
-      </div>
-      <div className="form-group row">
-        <label htmlFor="people" className="col-sm-2 col-form-label">
-          Party Size
-        </label>
-        <div className="col-sm-10">
-          <input
-            id="people"
-            name="people"
-            type="number"
-            min="1"
-            value={reservation.people}
-            onChange={changeHandler}
-            required={true}
-            className="form-control"
-          />
+        <div className="form-group row">
+          <label htmlFor="reservation_time" className="col-sm-2 col-form-label">
+            Reservation Time
+          </label>
+          <div className="col-sm-10">
+            <input
+              id="reservation_time"
+              name="reservation_time"
+              type="time"
+              value={reservation.reservation_time}
+              pattern="[0-9]{2}:[0-9]{2}"
+              onChange={changeHandler}
+              required={true}
+              className="form-control"
+            />
+          </div>
         </div>
-      </div>
-      <button type="submit">Submit</button>
-      <button type="button" onClick={() => history.goBack()}>
-        Cancel
-      </button>
-    </form>
+        <div className="form-group row">
+          <label htmlFor="people" className="col-sm-2 col-form-label">
+            Party Size
+          </label>
+          <div className="col-sm-10">
+            <input
+              id="people"
+              name="people"
+              type="number"
+              min={1}
+              value={reservation.people}
+              onChange={changeHandlerNum}
+              required={true}
+              className="form-control"
+            />
+          </div>
+        </div>
+        <button type="submit">Submit</button>
+        <button type="button" onClick={() => history.goBack()}>
+          Cancel
+        </button>
+      </form>
+    </div>
   );
 }
 

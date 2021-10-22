@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import {
   listReservations,
   listTables,
@@ -19,7 +20,8 @@ import Tables from "./Tables";
  * @returns {JSX.Element}
  */
 function Dashboard({ date }) {
-  const query = useQuery();
+  // const query = useQuery();
+  const history = useHistory();
   // const date = query.get("date") ? query.get("date") : today();
   // console.log("date", date);
 
@@ -40,7 +42,7 @@ function Dashboard({ date }) {
     listReservations({ date }, abortController.signal)
       .then(setReservations)
       .catch(setReservationsError);
-    listTables().then(setTables).catch(setTablesError);
+    listTables(abortController.signal).then(setTables).catch(setTablesError);
 
     return () => abortController.abort();
   }
@@ -52,12 +54,16 @@ function Dashboard({ date }) {
   }
 
   function onFinish(table_id, reservation_id) {
-    finishTable(table_id, reservation_id).then(loadDashboard);
+    const abortController = new window.AbortController();
+
+    finishTable(table_id, reservation_id, abortController.signal).then(
+      loadDashboard
+    );
   }
 
   return (
     <main>
-      <h1>Dashboard</h1>
+      <h1>Restaurant Dashboard</h1>
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Reservations for: {date}</h4>
       </div>
@@ -69,10 +75,10 @@ function Dashboard({ date }) {
         Previous
       </button>
 
-      {/*//////////// TODAY //////////////*/}
+      {/*//////////// TODAY ////////////// changed from /dashboard?date=${today}*/}
       <button
         className="btn btn-dark m-1 p-3"
-        onClick={() => history.push(`/dashboard?date=${today}`)}
+        onClick={() => history.push(`/dashboard`)}
       >
         Today
       </button>

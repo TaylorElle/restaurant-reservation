@@ -64,7 +64,9 @@ function Reservations({ onCancel, reservations = [] }) {
       );
     })
   ) : (
-    <div>No reservations found</div>
+    <div>
+      <p>No reservations found</p>
+    </div>
   );
   return <div className="table">{rows}</div>;
 }

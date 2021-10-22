@@ -51,7 +51,7 @@ function ReservationSeat() {
     setErrors(null);
 
     if (validateSeat) {
-      updateTable(tableId, reservation_id)
+      updateTable(tableId, reservation_id, abortController.signal)
         .then(() => listTables())
         .then(setTables)
         .then(() => listReservations({ date: today() }))

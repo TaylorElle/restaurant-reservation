@@ -20,14 +20,17 @@ function ReservationForm() {
   const [error, setError] = useState(null);
 
   function changeHandler({ target: { name, value } }) {
-    if (name === "people" && typeof value === "string") {
-      value = +value;
-    }
     setReservation((prevState) => ({
       ...prevState,
       [name]: value,
     }));
-    // console.log(reservation);
+  }
+
+  function changeHandlerNum({ target: { name, value } }) {
+    setReservation((prevState) => ({
+      ...prevState,
+      [name]: Number(value),
+    }));
   }
 
   function validate(reservation) {
@@ -119,6 +122,7 @@ function ReservationForm() {
   function submitHandler(event) {
     const abortController = new window.AbortController();
     event.preventDefault();
+    event.preventPropogation();
     setError(null);
     const itValidated = validate(reservation);
     // console.log(reservationError);
@@ -149,8 +153,9 @@ function ReservationForm() {
   return (
     <div>
       <form onSubmit={submitHandler}>
-        <ReservationErrors errors={error} />
-
+        <div>
+          <ReservationErrors errors={error} />
+        </div>
         <div className="form-group row">
           <label htmlFor="first_name">
             First Name
@@ -231,10 +236,10 @@ function ReservationForm() {
           <input
             id="people"
             name="people"
-            onChange={changeHandler}
+            onChange={changeHandlerNum}
             value={reservation.people}
             type="number"
-            min="1"
+            min={1}
             required={true}
             className="form-control"
           ></input>

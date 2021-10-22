@@ -12,10 +12,12 @@ function Search() {
   }
 
   function submitHandler(event) {
+    const abortController = new window.AbortController();
+
     event.preventDefault();
 
     setShowResults(false);
-    listReservations({ mobile_number: mobileNumber })
+    listReservations({ mobile_number: mobileNumber }, abortController.signal)
       .then(setReservations)
       .then(() => setShowResults(true));
   }

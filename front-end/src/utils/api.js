@@ -67,9 +67,10 @@ export async function listReservations(params, signal) {
     .then(formatReservationDate)
     .then(formatReservationTime);
 }
+
 // posts a new reservation to the database
 export async function postReservation(reservation, signal) {
-  const url = new URL(`${API_BASE_URL}/reservations`);
+  const url = `${API_BASE_URL}/reservations`;
   reservation.people = Number(reservation.people);
   console.log(headers);
 
@@ -83,6 +84,7 @@ export async function postReservation(reservation, signal) {
     .then(formatReservationDate)
     .then(formatReservationTime);
 }
+
 export async function createTable(table, signal) {
   const url = `${API_BASE_URL}/tables`;
   console.log(headers);
@@ -113,13 +115,14 @@ export async function seatReservation(reservation_id, table_id) {
   };
   return await fetchJson(url, options, {});
 }
-export async function finishTable(table_id, reservation_id) {
+export async function finishTable(table_id, reservation_id, signal) {
   const url = `${API_BASE_URL}/tables/${table_id}/seat`;
   console.log(headers);
 
   const options = {
     method: "DELETE",
     headers,
+    signal,
   };
   return await fetchJson(url, options, {});
 }
@@ -153,6 +156,7 @@ export async function cancelReservation(reservationId, signal) {
   };
   return await fetchJson(url, options, []);
 }
+
 export async function readReservation(reservation_id, signal) {
   const url = `${API_BASE_URL}/reservations/${reservation_id}`;
   console.log(headers);
@@ -161,6 +165,7 @@ export async function readReservation(reservation_id, signal) {
     .then(formatReservationDate)
     .then(formatReservationTime);
 }
+
 export async function updateTable(table_id, reservation_id, signal) {
   const url = `${API_BASE_URL}/tables/${table_id}/seat`;
   console.log(headers);
@@ -176,6 +181,7 @@ export async function updateTable(table_id, reservation_id, signal) {
     []
   );
 }
+
 export async function updateReservation(reservation, signal) {
   const url = `${API_BASE_URL}/reservations/${reservation.reservation_id}`;
 
