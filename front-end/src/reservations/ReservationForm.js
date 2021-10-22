@@ -35,24 +35,11 @@ function ReservationForm() {
 
   function validate(reservation) {
     const errors = [];
-    // console.log(errors);
 
     function isFutureDate({ reservation_date, reservation_time }) {
-      //reservation date
       const reservationDateTime = new Date(
         `${reservation_date}T${reservation_time}`
       );
-      // console.log("reservationDateTime line 50", reservationDateTime);
-      // //date right now = new Date()
-      // console.log(
-      //   reservationDateTime,
-      //   "---",
-      //   new Date(),
-      //   "-------->>>today",
-      //   today()
-      // );
-      // console.log("date now()", Date.now());
-      //if reservation date is less than date right now,
       if (reservationDateTime < new Date()) {
         errors.push(new Error("Reservation must be set in the future"));
       }
@@ -100,22 +87,14 @@ function ReservationForm() {
     }
 
     isFutureDate(reservation);
-    // console.log(isFutureDate(reservation));
     isTuesday(reservation);
-    // console.log(isTuesday(reservation));
     isOpenHours(reservation);
-    // console.log(isOpenHours(reservation));
 
     if (errors.length) {
       setError(errors);
       return false;
     }
     return true;
-
-    // return errors;
-
-    //set the state
-    //dont return it
   }
 
   //submit handler
@@ -125,28 +104,16 @@ function ReservationForm() {
     event.preventPropogation();
     setError(null);
     const itValidated = validate(reservation);
-    // console.log(reservationError);
-    // do not send POST request if there is an error message
-    // if (reservationError.length) {
-    //   return setError(reservationError);
-    // }
-    //IF NO ERRORS, POST IT.
 
     if (itValidated) {
-      console.log(error);
       // POST request (new reservation)
       postReservation(reservation, abortController.signal)
-        .then(
-          () => history.push(`/dashboard?date=${reservation.reservation_date}`)
-
-          // const res_date =
-          //   createdReservation.reservation_date.match(/\d{4}-\d{2}-\d{2}/)[0];
-          // history.push(`/dashboard?date=` + res_date);
+        .then(() =>
+          history.push(`/dashboard?date=${reservation.reservation_date}`)
         )
         .catch(setError);
       return () => abortController.abort();
     }
-    console.log(error);
   }
 
   //display errors if there's state

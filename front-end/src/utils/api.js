@@ -58,7 +58,6 @@ async function fetchJson(url, options, onCancel) {
  */
 export async function listReservations(params, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`);
-  console.log(headers);
 
   Object.entries(params).forEach(([key, value]) =>
     url.searchParams.append(key, value.toString())
@@ -72,7 +71,6 @@ export async function listReservations(params, signal) {
 export async function postReservation(reservation, signal) {
   const url = `${API_BASE_URL}/reservations`;
   reservation.people = Number(reservation.people);
-  console.log(headers);
 
   const options = {
     method: "POST",
@@ -87,7 +85,6 @@ export async function postReservation(reservation, signal) {
 
 export async function createTable(table, signal) {
   const url = `${API_BASE_URL}/tables`;
-  console.log(headers);
 
   const options = {
     method: "POST",
@@ -98,15 +95,11 @@ export async function createTable(table, signal) {
   return await fetchJson(url, options, table);
 }
 export async function listTables(signal) {
-  console.log(headers);
-
   const url = `${API_BASE_URL}/tables`;
   return await fetchJson(url, { headers, signal }, []);
 }
 export async function seatReservation(reservation_id, table_id) {
   const url = `${API_BASE_URL}/tables/${table_id}/seat`;
-
-  console.log(headers);
 
   const options = {
     method: "PUT",
@@ -117,7 +110,6 @@ export async function seatReservation(reservation_id, table_id) {
 }
 export async function finishTable(table_id, reservation_id, signal) {
   const url = `${API_BASE_URL}/tables/${table_id}/seat`;
-  console.log(headers);
 
   const options = {
     method: "DELETE",
@@ -129,7 +121,6 @@ export async function finishTable(table_id, reservation_id, signal) {
 
 export async function updateReservationStatus(reservationId, status, signal) {
   const url = `${API_BASE_URL}/reservations/${reservationId}/status`;
-  console.log(headers);
 
   const options = {
     method: "PUT",
@@ -142,7 +133,6 @@ export async function updateReservationStatus(reservationId, status, signal) {
 
 export async function cancelReservation(reservationId, signal) {
   const url = `${API_BASE_URL}/reservations/${reservationId}/status`;
-  console.log(headers);
 
   const options = {
     method: "PUT",
@@ -159,7 +149,6 @@ export async function cancelReservation(reservationId, signal) {
 
 export async function readReservation(reservation_id, signal) {
   const url = `${API_BASE_URL}/reservations/${reservation_id}`;
-  console.log(headers);
 
   return await fetchJson(url, { headers, signal }, {})
     .then(formatReservationDate)
@@ -168,7 +157,6 @@ export async function readReservation(reservation_id, signal) {
 
 export async function updateTable(table_id, reservation_id, signal) {
   const url = `${API_BASE_URL}/tables/${table_id}/seat`;
-  console.log(headers);
 
   return await fetchJson(
     url,
@@ -185,7 +173,6 @@ export async function updateTable(table_id, reservation_id, signal) {
 export async function updateReservation(reservation, signal) {
   const url = `${API_BASE_URL}/reservations/${reservation.reservation_id}`;
 
-  console.log(headers);
   const options = {
     method: "PUT",
     headers,

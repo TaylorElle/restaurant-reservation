@@ -7,10 +7,9 @@ import {
   cancelReservation,
 } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
-import { previous, today, next } from "../utils/date-time";
+import { previous, next } from "../utils/date-time";
 
 import Reservations from "./Reservations";
-import useQuery from "../utils/useQuery";
 import Tables from "./Tables";
 
 /**
@@ -20,15 +19,8 @@ import Tables from "./Tables";
  * @returns {JSX.Element}
  */
 function Dashboard({ date }) {
-  // const query = useQuery();
   const history = useHistory();
-  // const date = query.get("date") ? query.get("date") : today();
-  // console.log("date", date);
 
-  // const dateInUrl = useQuery().get("date");
-  // if (dateInUrl) {
-  //   date = dateInUrl;
-  // }
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const [tables, setTables] = useState([]);
