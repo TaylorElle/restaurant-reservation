@@ -1,4 +1,4 @@
-## Periodic Tables is a restaurant reservations scheduling and seating tool.
+# Periodic Tables is a restaurant reservations scheduling and seating tool.
 
 ##### Create tables.
 
