@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { postReservation } from "../utils/api";
 import ReservationErrors from "./ReservationError";
-// import { today } from "../utils/date-time.js";
 
 function ReservationForm() {
   const history = useHistory();

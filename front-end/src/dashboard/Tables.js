@@ -1,7 +1,6 @@
 import React from "react";
 
 function Tables({ onFinish, tables = [] }) {
-  
   function finishHandler({
     target: { dataset: { tableIdFinish, reservationIdFinish } } = {},
   }) {
