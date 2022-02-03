@@ -7,6 +7,7 @@ import NewTable from "../tables/NewTable";
 import ReservationSeat from "../reservations/ReservationSeat";
 import Search from "../search/Search";
 import ReservationEdit from "../reservations/ReservationEdit";
+import LogIn from "./Login.js";
 import { today } from "../utils/date-time";
 import useQuery from "../utils/useQuery";
 import NotFound from "./NotFound";
@@ -46,6 +47,9 @@ function Routes() {
       </Route>
       <Route exact={true} path="/search">
         <Search />
+      </Route>
+      <Route exact={true} path="/login">
+        <LogIn />
       </Route>
       <Route>
         <NotFound />
