@@ -22,11 +22,11 @@ function Menu() {
         </Link>
         <hr className="sidebar-divider my-0" />
         <ul className="nav navbar-nav text-light" id="accordionSidebar">
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <Link className="nav-link" to="/login">
               &nbsp;Log In
             </Link>
-          </li>
+          </li> */}
           <li className="nav-item">
             <Link className="nav-link" to="/dashboard">
               <span className="oi oi-account-login" />
